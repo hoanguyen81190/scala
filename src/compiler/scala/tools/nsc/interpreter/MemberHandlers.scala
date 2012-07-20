@@ -6,10 +6,7 @@
 package scala.tools.nsc
 package interpreter
 
-import scala.collection.{ mutable, immutable }
-import scala.PartialFunction.cond
-import scala.reflect.internal.Chars
-import language.implicitConversions
+import scala.collection.{ mutable }
 
 trait MemberHandlers {
   val intp: IMain
@@ -178,7 +175,7 @@ trait MemberHandlers {
 
   class ImportHandler(imp: Import) extends MemberHandler(imp) {
     val Import(expr, selectors) = imp
-    def targetType: Type = intp.typeOfExpression("" + expr)
+
     override def isLegalTopLevel = true
 
     def createImportForName(name: Name): String = {
@@ -201,26 +198,8 @@ trait MemberHandlers {
     /** Whether this import includes a wildcard import */
     val importsWildcard = selectorWild.nonEmpty
 
-    /** Whether anything imported is implicit .*/
-    def importsImplicit = implicitSymbols.nonEmpty
 
-    def implicitSymbols = importedSymbols filter (_.isImplicit)
-    def importedSymbols = individualSymbols ++ wildcardSymbols
 
-    lazy val individualSymbols: List[Symbol] =
-      beforePickler(individualNames map (targetType nonPrivateMember _))
-
-    lazy val wildcardSymbols: List[Symbol] =
-      if (importsWildcard) beforePickler(targetType.nonPrivateMembers)
-      else Nil
-
-    /** Complete list of names imported by a wildcard */
-    lazy val wildcardNames: List[Name]   = wildcardSymbols map (_.name)
-    lazy val individualNames: List[Name] = selectorRenames filterNot (_ == nme.USCOREkw) flatMap (_.bothNames)
-
-    /** The names imported by this statement */
-    override lazy val importedNames: List[Name] = wildcardNames ++ individualNames
-    lazy val importsSymbolNamed: Set[String] = importedNames map (_.toString) toSet
 
     def importString = imp.toString
     override def resultExtractionCode(req: Request) = codegenln(importString) + "\n"

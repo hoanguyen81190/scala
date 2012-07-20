@@ -564,6 +564,12 @@ abstract class UnCurry extends InfoTransform
       }
 
       val sym = tree.symbol
+      // Take a pass looking for @specialize annotations and set all
+      // their SPECIALIZE flags for cheaper recognition.
+      if ((sym ne null) && (sym.isClass || sym.isMethod)) {
+        for (tp <- sym.typeParams ; if tp hasAnnotation SpecializedClass)
+          tp setFlag SPECIALIZED
+      }
       val result = (
         // TODO - settings.noassertions.value temporarily retained to avoid
         // breakage until a reasonable interface is settled upon.
@@ -707,7 +713,7 @@ abstract class UnCurry extends InfoTransform
           addJavaVarargsForwarders(dd, flatdd)
 
         case Try(body, catches, finalizer) =>
-          if (!settings.XoldPatmat.value) { if(catches exists (cd => !treeInfo.isCatchCase(cd))) debugwarn("VPM BUG! illegal try/catch "+ catches); tree }
+          if (opt.virtPatmat) { if(catches exists (cd => !treeInfo.isCatchCase(cd))) debugwarn("VPM BUG! illegal try/catch "+ catches); tree }
           else if (catches forall treeInfo.isCatchCase) tree
           else {
             val exname = unit.freshTermName("ex$")

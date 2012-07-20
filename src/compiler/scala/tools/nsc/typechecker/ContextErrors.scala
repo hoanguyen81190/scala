@@ -562,9 +562,7 @@ trait ContextErrors {
 
       // SelectFromTypeTree
       def TypeSelectionFromVolatileTypeError(tree: Tree, qual: Tree) = {
-        val hiBound = qual.tpe.bounds.hi
-        val addendum = if (hiBound =:= qual.tpe) "" else s" (with upper bound ${hiBound})"
-        issueNormalTypeError(tree, s"illegal type selection from volatile type ${qual.tpe}${addendum}")
+        issueNormalTypeError(tree, "illegal type selection from volatile type "+qual.tpe)
         setError(tree)
       }
 

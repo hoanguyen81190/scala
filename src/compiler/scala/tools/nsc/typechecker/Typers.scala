@@ -47,6 +47,7 @@ trait Typers extends Modes with Adaptations with Tags {
   def resetTyper() {
     //println("resetTyper called")
     resetContexts()
+    resetNamer()
     resetImplicits()
     transformed.clear()
   }
@@ -93,7 +94,7 @@ trait Typers extends Modes with Adaptations with Tags {
   //  - we may virtualize matches (if -Xexperimental and there's a suitable __match in scope)
   //  - we synthesize PartialFunction implementations for `x => x match {...}` and `match {...}` when the expected type is PartialFunction
   // this is disabled by: -Xoldpatmat, scaladoc or interactive compilation
-  @inline private def newPatternMatching = !settings.XoldPatmat.value && !forScaladoc && !forInteractive // && (phase.id < currentRun.uncurryPhase.id)
+  @inline private def newPatternMatching = opt.virtPatmat && !forScaladoc && !forInteractive // && (phase.id < currentRun.uncurryPhase.id)
 
   abstract class Typer(context0: Context) extends TyperDiagnostics with Adaptation with Tag with TyperContextErrors {
     import context0.unit
@@ -1379,7 +1380,7 @@ trait Typers extends Modes with Adaptations with Tags {
             for (stat <- body)
               if (!treeInfo.isAllowedInUniversalTrait(stat) && !isUnderlyingAcc(stat.symbol))
                 unit.error(stat.pos,
-                  if (stat.symbol != null && (stat.symbol hasFlag PARAMACCESSOR)) "illegal parameter for value class"
+                  if (stat.symbol hasFlag PARAMACCESSOR) "illegal parameter for value class"
                   else "this statement is not allowed in value class: " + stat)
           case x =>
             unit.error(clazz.pos, "value class needs to have exactly one public val parameter")
@@ -2299,7 +2300,7 @@ trait Typers extends Modes with Adaptations with Tags {
       val casesTyped = typedCases(cases, selectorTp, pt)
 
       val (resTp, needAdapt) =
-        if (!settings.XoldPatmat.value) ptOrLubPacked(casesTyped, pt)
+        if (opt.virtPatmat) ptOrLubPacked(casesTyped, pt)
         else ptOrLub(casesTyped map (_.tpe), pt)
 
       val casesAdapted = if (!needAdapt) casesTyped else casesTyped map (adaptCase(_, mode, resTp))
@@ -2315,7 +2316,7 @@ trait Typers extends Modes with Adaptations with Tags {
 
       // TODO: add fallback __match sentinel to predef
       val matchStrategy: Tree =
-        if (!(newPatternMatching && settings.Xexperimental.value && context.isNameInScope(vpmName._match))) null    // fast path, avoiding the next line if there's no __match to be seen
+        if (!(newPatternMatching && opt.experimental && context.isNameInScope(vpmName._match))) null    // fast path, avoiding the next line if there's no __match to be seen
         else newTyper(context.makeImplicit(reportAmbiguousErrors = false)).silent(_.typed(Ident(vpmName._match), EXPRmode, WildcardType), reportAmbiguousErrors = false) match {
           case SilentResultValue(ms) => ms
           case _                     => null
@@ -3202,7 +3203,7 @@ trait Typers extends Modes with Adaptations with Tags {
 
     // if there's a ClassTag that allows us to turn the unchecked type test for `pt` into a checked type test
     // return the corresponding extractor (an instance of ClassTag[`pt`])
-    def extractorForUncheckedType(pos: Position, pt: Type): Option[Tree] = if (settings.XoldPatmat.value || isPastTyper) None else {
+    def extractorForUncheckedType(pos: Position, pt: Type): Option[Tree] = if (!opt.virtPatmat || isPastTyper) None else {
       // only look at top-level type, can't (reliably) do anything about unchecked type args (in general)
       pt.normalize.typeConstructor match {
         // if at least one of the types in an intersection is checkable, use the checkable ones
@@ -3980,7 +3981,7 @@ trait Typers extends Modes with Adaptations with Tags {
             // in the special (though common) case where the types are equal, it pays to pack before comparing
             // especially virtpatmat needs more aggressive unification of skolemized types
             // this breaks src/library/scala/collection/immutable/TrieIterator.scala
-            if ( !settings.XoldPatmat.value && !isPastTyper
+            if ( opt.virtPatmat && !isPastTyper
               && thenp1.tpe.annotations.isEmpty && elsep1.tpe.annotations.isEmpty // annotated types need to be lubbed regardless (at least, continations break if you by pass them like this)
               && thenTp =:= elseTp
                ) (thenp1.tpe, false) // use unpacked type
@@ -4282,7 +4283,7 @@ trait Typers extends Modes with Adaptations with Tags {
       }
 
       def convertToAssignment(fun: Tree, qual: Tree, name: Name, args: List[Tree]): Tree = {
-        val prefix = name.toTermName stripSuffix nme.EQL
+        val prefix = name stripSuffix nme.EQL
         def mkAssign(vble: Tree): Tree =
           Assign(
             vble,
@@ -4430,7 +4431,7 @@ trait Typers extends Modes with Adaptations with Tags {
 
           if (!qual.tpe.widen.isErroneous) {
             if ((mode & QUALmode) != 0) {
-              val lastTry = rootMirror.missingHook(qual.tpe.typeSymbol, name)
+              val lastTry = missingHook(qual.tpe.typeSymbol, name)
               if (lastTry != NoSymbol) return typed1(tree setSymbol lastTry, mode, pt)
             }
             NotAMemberError(tree, qual, name)
@@ -4672,7 +4673,7 @@ trait Typers extends Modes with Adaptations with Tags {
               log("Allowing empty package member " + name + " due to settings.")
             else {
               if ((mode & QUALmode) != 0) {
-                val lastTry = rootMirror.missingHook(rootMirror.RootClass, name)
+                val lastTry = missingHook(rootMirror.RootClass, name)
                 if (lastTry != NoSymbol) return typed1(tree setSymbol lastTry, mode, pt)
               }
               if (settings.debug.value) {
@@ -5113,7 +5114,7 @@ trait Typers extends Modes with Adaptations with Tags {
 
         case SelectFromTypeTree(qual, selector) =>
           val qual1 = typedType(qual, mode)
-          if (qual1.tpe.isVolatile) TypeSelectionFromVolatileTypeError(tree, qual1)
+          if (qual1.tpe.isVolatile) TypeSelectionFromVolatileTypeError(tree, qual)
           else typedSelect(qual1, selector)
 
         case CompoundTypeTree(templ) =>

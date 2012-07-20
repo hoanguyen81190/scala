@@ -13,6 +13,7 @@ trait Formatting {
 
   def spaces(code: String): String = {
     /** Heuristic to avoid indenting and thereby corrupting """-strings and XML literals. */
+    //[comment from me]: identify how is a space can be broken when parsing
     val tokens = List("\"\"\"", "</", "/>")
     val noIndent = (code contains "\n") && (tokens exists code.contains)
 

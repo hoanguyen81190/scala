@@ -16,7 +16,7 @@ import scala.reflect.runtime.{universe => ru}
  */
 abstract class ReplVals { }
 
-class StdReplVals(final val r: ILoop) extends ReplVals {
+class StdReplVals(final val r: MyILoop) extends ReplVals {
   final lazy val repl                     = r
   final lazy val intp                     = r.intp
   final lazy val power                    = r.power

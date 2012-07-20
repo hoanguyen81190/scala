@@ -503,7 +503,7 @@ abstract class Pickler extends SubComponent {
     private def writeSymInfo(sym: Symbol) {
       writeRef(sym.name)
       writeRef(localizedOwner(sym))
-      writeLongNat((rawToPickledFlags(sym.flags & PickledFlags)))
+      writeLongNat((rawFlagsToPickled(sym.flags & PickledFlags)))
       if (sym.hasAccessBoundary) writeRef(sym.privateWithin)
       writeRef(sym.info)
     }
@@ -966,7 +966,7 @@ abstract class Pickler extends SubComponent {
           TREE
 
         case Modifiers(flags, privateWithin, _) =>
-          val pflags = rawToPickledFlags(flags)
+          val pflags = rawFlagsToPickled(flags)
           writeNat((pflags >> 32).toInt)
           writeNat((pflags & 0xFFFFFFFF).toInt)
           writeRef(privateWithin)

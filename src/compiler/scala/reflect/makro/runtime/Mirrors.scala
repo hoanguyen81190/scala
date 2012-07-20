@@ -24,14 +24,11 @@ trait Mirrors {
       else NoSymbol
     }
 
-    private lazy val libraryClasspathLoader: ClassLoader = {
-      val classpath = platform.classPath.asURLs
-      ScalaClassLoader.fromURLs(classpath)
-    }
-
     private def isJavaClass(path: String): Boolean =
       try {
-        Class.forName(path, true, libraryClasspathLoader)
+        val classpath = platform.classPath.asURLs
+        var classLoader = ScalaClassLoader.fromURLs(classpath)
+        Class.forName(path, true, classLoader)
         true
       } catch {
         case (_: ClassNotFoundException) | (_: NoClassDefFoundError) | (_: IncompatibleClassChangeError) =>

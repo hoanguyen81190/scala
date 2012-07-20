@@ -30,9 +30,9 @@ object JarRunner extends CommonRunner {
 }
 
 /** An object that runs Scala code.  It has three possible
-  * sources for the code to run: pre-compiled code, a script file,
-  * or interactive entry.
-  */
+ * sources for the code to run: pre-compiled code, a script file,
+ * or interactive entry.
+ */
 class MainGenericRunner {
   def errorFn(ex: Throwable): Boolean = {
     ex.printStackTrace()

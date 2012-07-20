@@ -44,7 +44,7 @@ trait JavaPlatform extends Platform {
     else List(dependencyAnalysis)
 
   private def classEmitPhase =
-    if (settings.target.value == "jvm-1.5-fjbg") genJVM
+    if (settings.target.value == "jvm-1.5") genJVM
     else genASM
 
   def platformPhases = List(

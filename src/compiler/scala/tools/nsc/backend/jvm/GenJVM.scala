@@ -183,7 +183,6 @@ abstract class GenJVM extends SubComponent with GenJVMUtil with GenAndroid with 
   class BytecodeGenerator(bytecodeWriter: BytecodeWriter) extends BytecodeUtil {
     def this() = this(new ClassBytecodeWriter { })
     def debugLevel = settings.debuginfo.indexOfChoice
-    import bytecodeWriter.writeClass
 
     val MIN_SWITCH_DENSITY = 0.7
     val INNER_CLASSES_FLAGS =
@@ -342,6 +341,15 @@ abstract class GenJVM extends SubComponent with GenJVMUtil with GenAndroid with 
     def emitClass(jclass: JClass, sym: Symbol) {
       addInnerClasses(jclass)
       writeClass("" + sym.name, jclass.getName(), toByteArray(jclass), sym)
+    }
+
+    val needsOutfileForSymbol = bytecodeWriter.isInstanceOf[ClassBytecodeWriter]
+
+    def writeClass(label: String, jclassName: String, jclassBytes: Array[Byte], sym: Symbol) {
+      val outF: scala.tools.nsc.io.AbstractFile = {
+        if(needsOutfileForSymbol) getFile(sym, jclassName, ".class") else null
+      }
+      bytecodeWriter.writeClass(label, jclassName, jclassBytes, outF)
     }
 
     /** Returns the ScalaSignature annotation if it must be added to this class,
@@ -727,8 +735,7 @@ abstract class GenJVM extends SubComponent with GenJVMUtil with GenAndroid with 
       // without it.  This is particularly bad because the availability of
       // generic information could disappear as a consequence of a seemingly
       // unrelated change.
-         settings.Ynogenericsig.value
-      || sym.isHidden
+         sym.isSynthetic
       || sym.isLiftedMethod
       || sym.isBridge
       || (sym.ownerChain exists (_.isImplClass))
@@ -756,7 +763,7 @@ abstract class GenJVM extends SubComponent with GenJVMUtil with GenAndroid with 
             }
           }
           val index = jmember.getConstantPool.addUtf8(sig).toShort
-          if (settings.verbose.value && settings.debug.value)
+          if (opt.verboseDebug)
             beforeErasure(println("add generic sig "+sym+":"+sym.info+" ==> "+sig+" @ "+index))
 
           val buf = ByteBuffer.allocate(2)
@@ -1973,7 +1980,6 @@ abstract class GenJVM extends SubComponent with GenJVMUtil with GenAndroid with 
       if (finalFlag && !sym.hasAbstractFlag) ACC_FINAL else 0,
       if (sym.isStaticMember) ACC_STATIC else 0,
       if (sym.isBridge) ACC_BRIDGE | ACC_SYNTHETIC else 0,
-      if (sym.isHidden) ACC_SYNTHETIC else 0,
       if (sym.isClass && !sym.isInterface) ACC_SUPER else 0,
       if (sym.isVarargsMethod) ACC_VARARGS else 0,
       if (sym.hasFlag(Flags.SYNCHRONIZED)) JAVA_ACC_SYNCHRONIZED else 0

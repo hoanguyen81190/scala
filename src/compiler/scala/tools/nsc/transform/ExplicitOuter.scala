@@ -92,7 +92,7 @@ abstract class ExplicitOuter extends InfoTransform
     else findOrElse(clazz.info.decls)(_.outerSource == clazz)(NoSymbol)
   }
   def newOuterAccessor(clazz: Symbol) = {
-    val accFlags = SYNTHETIC | HIDDEN | METHOD | STABLE | ( if (clazz.isTrait) DEFERRED else 0 )
+    val accFlags = SYNTHETIC | METHOD | STABLE | ( if (clazz.isTrait) DEFERRED else 0 )
     val sym      = clazz.newMethod(nme.OUTER, clazz.pos, accFlags)
     val restpe   = if (clazz.isTrait) clazz.outerClass.tpe else clazz.outerClass.thisType
 
@@ -101,7 +101,7 @@ abstract class ExplicitOuter extends InfoTransform
     sym setInfo MethodType(Nil, restpe)
   }
   def newOuterField(clazz: Symbol) = {
-    val accFlags = SYNTHETIC | HIDDEN | PARAMACCESSOR | ( if (clazz.isEffectivelyFinal) PrivateLocal else PROTECTED )
+    val accFlags = SYNTHETIC | PARAMACCESSOR | ( if (clazz.isEffectivelyFinal) PrivateLocal else PROTECTED )
     val sym      = clazz.newValue(nme.OUTER_LOCAL, clazz.pos, accFlags)
 
     sym setInfo clazz.outerClass.thisType
@@ -516,11 +516,11 @@ abstract class ExplicitOuter extends InfoTransform
           super.transform(treeCopy.Apply(tree, sel, outerVal :: args))
 
         // entry point for pattern matcher translation
-        case mch: Match if settings.XoldPatmat.value => // don't use old pattern matcher as fallback when the user wants the virtualizing one
+        case mch: Match if (!opt.virtPatmat) => // don't use old pattern matcher as fallback when the user wants the virtualizing one
           matchTranslation(mch)
 
         case _ =>
-          if (!settings.XoldPatmat.value) { // this turned out to be expensive, hence the hacky `if` and `return`
+          if (opt.virtPatmat) { // this turned out to be expensive, hence the hacky `if` and `return`
             tree match {
               // for patmatvirtualiser
               // base.<outer>.eq(o) --> base.$outer().eq(o) if there's an accessor, else the whole tree becomes TRUE
