@@ -72,9 +72,8 @@ class MyILoop(protected val out: JPrintWriter)
 
     in = SimpleReader()
 
-    try loop()
-    catch AbstractOrMissingHandler()
-    finally closeInterpreter()
+    loop()
+    closeInterpreter()
 
     true
   }

@@ -7,8 +7,6 @@ package scala.tools.nsc
 package interpreter
 
 import java.io.IOException
-import java.nio.channels.ClosedByInterruptException
-import scala.util.control.Exception._
 import session.History
 import InteractiveReader._
 import Properties.isMac
@@ -26,13 +24,8 @@ trait InteractiveReader {
   def redrawLine(): Unit
   def currentLine: String
 
-  def readYesOrNo(prompt: String, alt: => Boolean): Boolean = readOneKey(prompt) match {
-    case 'y'  => true
-    case 'n'  => false
-    case _    => alt
-  }
-  def readAssumingNo(prompt: String)  = readYesOrNo(prompt, false)
-  def readAssumingYes(prompt: String) = readYesOrNo(prompt, true)
+
+
 
   protected def readOneLine(prompt: String): String
   protected def readOneKey(prompt: String): Int

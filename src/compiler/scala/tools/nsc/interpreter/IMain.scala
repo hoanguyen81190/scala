@@ -15,12 +15,8 @@ import scala.tools.nsc.io.AbstractFile
 import reporters._
 import scala.tools.util.PathResolver
 import scala.tools.nsc.util.ScalaClassLoader
-import ScalaClassLoader.URLClassLoader
 import scala.collection.{ mutable }
 import IMain._
-import java.util.concurrent.Future
-import java.io.PrintWriter
-
 
 /** directory to save .class files to */
 private class ReplVirtualDirectory(out: JPrintWriter) extends VirtualDirectory("(memory)", None) {
@@ -43,7 +39,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   val virtualDirectory: VirtualDirectory            = new ReplVirtualDirectory(out) // "directory" for classfiles
   private var currentSettings: Settings             = initialSettings
   private var _initializeComplete                   = false     // compiler is initialized
-  private var _isInitialized: Future[Boolean]       = null      // set up initialization future
 
   private var _classLoader: AbstractFileClassLoader = null                              // active classloader
   private val _compiler: Global                     = newCompiler(settings, reporter)   // our private compiler
@@ -58,14 +53,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     else new PathResolver(settings).result.asURLs  // the compiler's classpath
     )
   def settings = currentSettings
-  def savingSettings[T](fn: Settings => Unit)(body: => T): T = {
-    val saved = currentSettings
-    currentSettings = saved.copy()
-    fn(currentSettings)
-    try body
-    finally currentSettings = saved
-  }
-
   def this(settings: Settings) = this(settings, new NewLinePrintWriter(new ConsoleWriter, true))
   def this() = this(new Settings())
 
@@ -77,71 +64,31 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   import reporter.{ printMessage}
 
   private def _initSources = List(new BatchSourceFile("<init>", "class $repl_$init { }"))
-  private def _initialize() = {
-    try {
-      // [Eugene] todo. if this crashes, REPL will hang
-      new _compiler.Run() compileSources _initSources
-      _initializeComplete = true
-      true
-    }
-    catch AbstractOrMissingHandler()
-  }
+
   private def tquoted(s: String) = "\"\"\"" + s + "\"\"\""
 
-  // argument is a thunk to execute after init is done
-  def initialize(postInitSignal: => Unit) {
-    synchronized {
-      if (_isInitialized == null) {
-        _isInitialized = io.spawn {
-          try _initialize()
-          finally postInitSignal
-        }
-      }
-    }
-  }
+
 
   def isInitializeComplete = _initializeComplete
 
   /** the public, go through the future compiler */
   lazy val global: Global = {
-    if (isInitializeComplete) _compiler
-    else {
-      // If init hasn't been called yet you're on your own.
-      if (_isInitialized == null) {
-
-        initialize(())
-      }
-      // blocks until it is ; false means catastrophic failure
-      if (_isInitialized.get()) _compiler
-      else null
-    }
+      new _compiler.Run() compileSources _initSources
+      _initializeComplete = true
+      _compiler
   }
   @deprecated("Use `global` for access to the compiler instance.", "2.9.0")
   lazy val compiler: global.type = global
 
   import global._
-  import definitions.{termMember}
 
-  implicit class ReplTypeOps(tp: Type) {
-    def orElse(other: => Type): Type    = if (tp ne NoType) tp else other
-    def andAlso(fn: Type => Type): Type = if (tp eq NoType) tp else fn(tp)
-  }
 
   // TODO: If we try to make naming a lazy val, we run into big time
   // scalac unhappiness with what look like cycles.  It has not been easy to
   // reduce, but name resolution clearly takes different paths.
   object naming extends {
     val global: imain.global.type = imain.global
-  } with Naming {
-    // make sure we don't overwrite their unwisely named res3 etc.
-    def freshUserTermName(): TermName = {
-      val name = newTermName(freshUserVarName())
-      if (definedNameMap contains name) freshUserTermName()
-      else name
-    }
-    def isUserTermName(name: Name) = isUserVarName("" + name)
-    def isInternalTermName(name: Name) = isInternalVarName("" + name)
-  }
+  } with Naming
   import naming._
 
   lazy val memberHandlers = new {
@@ -149,8 +96,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   } with MemberHandlers
   import memberHandlers._
 
-  /** interpreter settings */
-  lazy val isettings = new ISettings(this)
 
   /** Instantiate a compiler.  Overridable. */
   protected def newCompiler(settings: Settings, reporter: Reporter): ReplGlobal = {
@@ -170,13 +115,10 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   private class TranslatingClassLoader(parent: ClassLoader) extends AbstractFileClassLoader(virtualDirectory, parent) {
   }
   private def makeClassLoader(): AbstractFileClassLoader =
-    new TranslatingClassLoader(parentClassLoader match {
-      case null   => ScalaClassLoader fromURLs compilerClasspath
-      case p      => new URLClassLoader(compilerClasspath, p)
-    })
+    new TranslatingClassLoader(ScalaClassLoader fromURLs compilerClasspath)
 
-  def allDefinedNames = definedNameMap.keys.toList.sorted
-  def pathToType(id: String): String = pathToName(newTypeName(id))
+
+
   def pathToTerm(id: String): String = pathToName(newTermName(id))
   def pathToName(name: Name): String = {
     if (definedNameMap contains name)
@@ -194,8 +136,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   def compileSources(sources: SourceFile*): Boolean =
     compileSourcesKeepingRun(sources: _*)._1
 
-  def compileString(code: String): Boolean =
-    compileSources(new BatchSourceFile("<script>", code))
 
   private def requestFromLine(line: String): Request = {
     val content = indentCode(line)
@@ -308,11 +248,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     val handlers: List[MemberHandler] = trees map (memberHandlers chooseHandler _)
     def defHandlers = handlers collect { case x: MemberDefHandler => x }
 
-    /** all (public) names defined by these statements */
-    val definedNames = handlers flatMap (_.definedNames)
-
-    /** list of names used by this expression */
-    val referencedNames: List[Name] = handlers flatMap (_.referencedNames)
 
     /** def and val names */
     def termNames = handlers flatMap (_.definesTerm)
@@ -424,16 +359,12 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
 
   def parse(line: String): Option[List[Tree]] = exprTyper.parse(line)
 
-  private val prevRequests       = mutable.ListBuffer[Request]()
   private val definedNameMap     = mutable.Map[Name, Request]()
 
-  def prevRequestList     = prevRequests.toList
 }
 
 object IMain {
-  private def removeLineWrapper(s: String) = s.replaceAll("""\$line\d+[./]\$(read|eval|print)[$.]""", "")
-  private def removeIWPackages(s: String)  = s.replaceAll("""\$(iw|read|eval|print)[$.]""", "")
-  def stripString(s: String)               = removeIWPackages(removeLineWrapper(s))
+
 
   trait CodeAssembler[T] {
     def preamble: String

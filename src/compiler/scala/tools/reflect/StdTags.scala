@@ -42,7 +42,6 @@ object StdTags {
   lazy val tagOfInt = ru.TypeTag.Int
   lazy val tagOfFile = tagOfStaticClass[scala.tools.nsc.io.File]
   lazy val tagOfDirectory = tagOfStaticClass[scala.tools.nsc.io.Directory]
-  lazy val tagOfStdReplVals = tagOfStaticClass[scala.tools.nsc.interpreter.StdReplVals]
   lazy val tagOfIMain = tagOfStaticClass[scala.tools.nsc.interpreter.IMain]
   lazy val tagOfThrowable = tagOfStaticClass[java.lang.Throwable]
   lazy val tagOfClassLoader = tagOfStaticClass[java.lang.ClassLoader]

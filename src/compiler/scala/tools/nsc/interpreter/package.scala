@@ -42,8 +42,6 @@ package object interpreter extends ReplConfig with ReplStrings {
     xs.asScala.toList map ("" + _)
   }
 
-  private[nsc] implicit def enrichClass[T](clazz: Class[T]) = new RichClass[T](clazz)
   private[nsc] implicit def enrichAnyRefWithTap[T](x: T) = new TapMaker(x)
-  private[nsc] def tracing[T](msg: String)(x: T): T = x.tapTrace(msg)
   private[nsc] def debugging[T](msg: String)(x: T) = x.tapDebug(msg)
 }
