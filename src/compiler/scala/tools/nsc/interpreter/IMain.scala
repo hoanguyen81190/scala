@@ -17,18 +17,7 @@ import scala.tools.util.PathResolver
 import scala.tools.nsc.util.ScalaClassLoader
 import scala.collection.{ mutable }
 import IMain._
-
-/** directory to save .class files to */
-private class ReplVirtualDirectory(out: JPrintWriter) extends VirtualDirectory("(memory)", None) {
-  private def pp(root: AbstractFile, indentLevel: Int) {
-    val spaces = "    " * indentLevel
-    out.println(spaces + root.name)
-    if (root.isDirectory)
-      root.toList sortBy (_.name) foreach (x => pp(x, indentLevel + 1))
-  }
-  // print the contents hierarchically
-  def show() = pp(this, 0)
-}
+import java.lang.Class
 
 
 class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
@@ -36,7 +25,7 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
 
   /** Leading with the eagerly evaluated.
    */
-  val virtualDirectory: VirtualDirectory            = new ReplVirtualDirectory(out) // "directory" for classfiles
+  val virtualDirectory: VirtualDirectory            = new VirtualDirectory("(memory)", None) // "directory" for classfiles
   private var currentSettings: Settings             = initialSettings
   private var _initializeComplete                   = false     // compiler is initialized
 
@@ -56,17 +45,11 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   def this(settings: Settings) = this(settings, new NewLinePrintWriter(new ConsoleWriter, true))
   def this() = this(new Settings())
 
-  lazy val formatting: Formatting = new Formatting {
-    val prompt = Properties.shellPromptString
-  }
   lazy val reporter: ConsoleReporter = new ConsoleReporter(this.settings, Console.in, this.out)
-  import formatting._
+
   import reporter.{ printMessage}
 
   private def _initSources = List(new BatchSourceFile("<init>", "class $repl_$init { }"))
-
-  private def tquoted(s: String) = "\"\"\"" + s + "\"\"\""
-
 
 
   def isInitializeComplete = _initializeComplete
@@ -82,10 +65,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
 
   import global._
 
-
-  // TODO: If we try to make naming a lazy val, we run into big time
-  // scalac unhappiness with what look like cycles.  It has not been easy to
-  // reduce, but name resolution clearly takes different paths.
   object naming extends {
     val global: imain.global.type = imain.global
   } with Naming
@@ -98,10 +77,10 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
 
 
   /** Instantiate a compiler.  Overridable. */
-  protected def newCompiler(settings: Settings, reporter: Reporter): ReplGlobal = {
+  protected def newCompiler(settings: Settings, reporter: Reporter): Global = {
     settings.outputDirs setSingleOutput virtualDirectory
     settings.exposeEmptyPackage.value = true
-    new Global(settings, reporter) with ReplGlobal
+    new Global(settings, reporter)
   }
 
   /** Parent classloader.  Overridable. */
@@ -118,14 +97,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     new TranslatingClassLoader(ScalaClassLoader fromURLs compilerClasspath)
 
 
-
-  def pathToTerm(id: String): String = pathToName(newTermName(id))
-  def pathToName(name: Name): String = {
-    if (definedNameMap contains name)
-      definedNameMap(name) fullPath name
-    else name.toString
-  }
-
   def compileSourcesKeepingRun(sources: SourceFile*) = {
     val run = new Run()
     reporter.reset()
@@ -136,10 +107,8 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   def compileSources(sources: SourceFile*): Boolean =
     compileSourcesKeepingRun(sources: _*)._1
 
-
   private def requestFromLine(line: String): Request = {
-    val content = indentCode(line)
-    val trees = parse(content) match {
+    val trees = parse(line) match {
       case None         => return null
       case Some(Nil)    => return null
       case Some(trees)  => trees
@@ -154,20 +123,17 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   }
 
 
-  def interpret(line: String): IR.Result = {
-    def loadAndRunReq(req: Request) = {
-      classLoader.setAsContext()
-      val result = req.loadAndRun
-          printMessage(result stripSuffix "\n")
-        IR.Success
-
-    }
-
-    if (global == null) IR.Error
+  def interpret(line: String): Boolean = {
+    if (global == null) false
     else {
       val req = requestFromLine(line)
-        if (req == null || !req.compile) IR.Error
-        else loadAndRunReq(req)
+        if (req == null || !req.compile) false
+        else {
+          classLoader.setAsContext()
+          val result = req.loadAndRun
+          printMessage(result stripSuffix "\n")
+          true
+        }
     }
   }
 
@@ -222,7 +188,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
       val path = newTermNameCached(readPath).toTermName
       val len = path.length
       getModuleOrClass(path, len)
-
     }
 
     private def evalMethod(name: String) = evalClass.getMethods filter (_.getName == name) match {
@@ -235,7 +200,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     }
   }
 
-
   class Request(val line: String, val trees: List[Tree]) {
     val reqId = nextReqId()
     val lineRep = new ReadEvalPrint()
@@ -244,15 +208,11 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
 
     def originalLine = if (_originalLine == null) line else _originalLine
 
-    /** handlers for each tree in this request */
     val handlers: List[MemberHandler] = trees map (memberHandlers chooseHandler _)
     def defHandlers = handlers collect { case x: MemberDefHandler => x }
 
-
-    /** def and val names */
     def termNames = handlers flatMap (_.definesTerm)
     def typeNames = handlers flatMap (_.definesType)
-
 
     def fullPath(vname: String) = (
       lineRep.readPath + ".`%s`".format(vname)
@@ -261,34 +221,16 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     def fullFlatName(name: String) =
       lineRep.readPath + nme.NAME_JOIN_STRING + name
 
-
-    /** Code to access a variable with the specified name */
     def fullPath(vname: Name): String = fullPath(vname.toString)
 
-    /** the line of code to compute */
     def toCompute = line
     def lookupTypeOf(name: Name) = typeOf.getOrElse(name, typeOf(global.encode(name.toString)))
-    /** generate the source code for the object that computes this request */
-    private object ObjectSourceCode extends CodeAssembler[MemberHandler] {
-      def path = pathToTerm("$intp")
-      def envLines = {
-        if (!isReplPower) Nil // power mode only for now
-        // $intp is not bound; punt, but include the line.
-        else if (path == "$intp") List(
-          "def $line = " + tquoted(originalLine),
-          "def $trees = Nil"
-        )
-        else List(
-          "def $line  = " + tquoted(originalLine),
-          "def $req = %s.requestForReqId(%s).orNull".format(path, reqId),
-          "def $trees = if ($req eq null) Nil else $req.trees".format(lineRep.readName, path, reqId)
-        )
-      }
 
+    private object ObjectSourceCode extends CodeAssembler[MemberHandler] {
       val preamble = """
                        |object %s {
-                       |%s%s
-                     """.stripMargin.format(lineRep.readName, envLines.map("  " + _ + ";\n").mkString, indentCode(toCompute))
+                       |%s
+                     """.stripMargin.format(lineRep.readName, toCompute)
       val postamble = "\n}"
       val generate = (m: MemberHandler) => m extraCodeToEvaluate Request.this
     }
@@ -296,8 +238,7 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     private object ResultObjectSourceCode extends CodeAssembler[MemberHandler] {
 
       val evalResult =
-        if (!handlers.last.definesValue) ""
-        else handlers.last.definesTerm match {
+        handlers.last.definesTerm match {
           case Some(vname) =>
             "lazy val %s = %s".format(lineRep.resultName, fullPath(vname))
           case _  => ""
@@ -358,8 +299,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   } with ExprTyper { }
 
   def parse(line: String): Option[List[Tree]] = exprTyper.parse(line)
-
-  private val definedNameMap     = mutable.Map[Name, Request]()
 
 }
 

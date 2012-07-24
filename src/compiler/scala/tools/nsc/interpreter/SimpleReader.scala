@@ -7,37 +7,28 @@ package scala.tools.nsc
 package interpreter
 
 import java.io.{ BufferedReader }
-import session.NoHistory
+import java.io.PrintWriter
 
 /** Reads using standard JDK API */
 class SimpleReader(
-  in: BufferedReader,
-  out: JPrintWriter,
-  val interactive: Boolean)
-extends InteractiveReader
+                    in: BufferedReader,
+                    out: PrintWriter,
+                    val interactive: Boolean)
 {
-  val history = NoHistory
-  val completion = NoCompletion
-
-  def init() = ()
-  def reset() = ()
-  def eraseLine() = ()
-  def redrawLine() = ()
-  def currentLine = ""
-  def readOneLine(prompt: String): String = {
+  def readLine(prompt: String): String = {
     if (interactive) {
       out.print(prompt)
       out.flush()
     }
     in.readLine()
   }
-  def readOneKey(prompt: String)  = sys.error("No char-based input in SimpleReader")
 }
 
 object SimpleReader {
   def defaultIn  = Console.in
-  def defaultOut = new JPrintWriter(Console.out)
+  def defaultOut = new PrintWriter(Console.out)
 
-  def apply(in: BufferedReader = defaultIn, out: JPrintWriter = defaultOut, interactive: Boolean = true): SimpleReader =
+  def apply(): SimpleReader = new SimpleReader(defaultIn, defaultOut, true)
+  def apply(in: BufferedReader = defaultIn, out: PrintWriter = defaultOut, interactive: Boolean = true): SimpleReader =
     new SimpleReader(in, out, interactive)
 }

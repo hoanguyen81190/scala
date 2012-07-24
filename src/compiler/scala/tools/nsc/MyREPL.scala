@@ -8,10 +8,7 @@ package scala.tools.nsc
 import interpreter.{MyILoop}
 
 object MyREPL {
-  def errorFn(ex: Throwable): Boolean = {
-    ex.printStackTrace()
-    false
-  }
+
   def errorFn(str: String): Boolean = {
     Console.err println str
     false

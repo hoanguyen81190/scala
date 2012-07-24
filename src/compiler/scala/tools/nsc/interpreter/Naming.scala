@@ -10,36 +10,6 @@ package interpreter
  *  That includes at least generating, metaquoting, mangling, and unmangling.
  */
 trait Naming {
-  def unmangle(str: String): String = {
-    val ESC = '\u001b'
-    val cleaned = removeIWPackages(removeLineWrapper(str))
-    // Looking to exclude binary data which hoses the terminal, but
-    // let through the subset of it we need, like whitespace and also
-    // <ESC> for ansi codes.
-    val binaryChars = cleaned count (ch => ch < 32 && !ch.isWhitespace && ch != ESC)
-    // Lots of binary chars - translate all supposed whitespace into spaces
-    if (binaryChars > 5)
-      cleaned map (ch => if (ch.isWhitespace) ' ' else if (ch < 32) '?' else ch)
-    // Not lots - preserve whitespace and ESC
-    else
-      cleaned map (ch => if (ch.isWhitespace || ch == ESC) ch else if (ch < 32) '?' else ch)
-  }
-
-  // The two name forms this is catching are the two sides of this assignment:
-  //
-  // $line3.$read.$iw.$iw.Bippy =
-  //   $line3.$read$$iw$$iw$Bippy@4a6a00ca
-
-  private def noMeta(s: String) = "\\Q" + s + "\\E"
-  private lazy val lineRegex = {
-    val sn = sessionNames
-    val members = List(sn.read, sn.eval, sn.print) map noMeta mkString ("(?:", "|", ")")
-    debugging("lineRegex")(noMeta(sn.line) + """\d+[./]""" + members + """[$.]""")
-  }
-
-  private def removeLineWrapper(s: String) = s.replaceAll(lineRegex, "")
-  private def removeIWPackages(s: String)  = s.replaceAll("""\$iw[$.]""", "")
-
   trait SessionNames {
     // All values are configurable by passing e.g. -Dscala.repl.name.read=XXX
     final def propOr(name: String): String = propOr(name, "$" + name)
@@ -78,7 +48,7 @@ trait Naming {
   private lazy val userVar     = new NameCreator(sessionNames.res)  // var name, like res0
   private lazy val internalVar = new NameCreator(sessionNames.ires) // internal var name, like $ires0
 
-  def isLineName(name: String)        = (name startsWith sessionNames.line) && (name stripPrefix sessionNames.line forall (_.isDigit))
+
   def isUserVarName(name: String)     = userVar didGenerate name
   def isInternalVarName(name: String) = internalVar didGenerate name
 
@@ -89,10 +59,7 @@ trait Naming {
   def freshUserVarName() = userVar()
   def freshInternalVarName() = internalVar()
 
-  def resetAllCreators() {
-    userVar.reset()
-    internalVar.reset()
-  }
 
-  def mostRecentVar = userVar.mostRecent
+
+
 }

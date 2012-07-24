@@ -7,21 +7,15 @@ package scala.tools.nsc
 package interpreter
 
 import java.lang.{ reflect => r }
-import r.TypeVariable
 import scala.reflect.NameTransformer
-import NameTransformer._
-import scala.reflect.runtime.{universe => ru}
-import scala.reflect.{ClassTag, classTag}
 import typechecker.DestructureTypes
-import scala.reflect.internal.util.StringOps.ojoin
-import language.implicitConversions
+
 
 /** A more principled system for turning types into strings.
  */
 trait StructuredTypeStrings extends DestructureTypes {
   val global: Global
   import global._
-  import definitions._
 
   case class LabelAndType(label: String, typeName: String) { }
   object LabelAndType {
@@ -49,7 +43,6 @@ trait StructuredTypeStrings extends DestructureTypes {
     l1 +: l2 :+ l3 mkString "\n"
   }
   private def maybeBlock(level: Int, grouping: Grouping)(name: String, nodes: List[TypeNode]): String = {
-    import grouping._
     val threshold = 70
 
     val try1 = str(level)(name + grouping.join(nodes map (_.show(0, grouping.labels)): _*))
@@ -149,112 +142,3 @@ trait StructuredTypeStrings extends DestructureTypes {
   def show(tp: Type): String = intoNodes(tp).show
 }
 
-
-/** Logic for turning a type into a String.  The goal is to be
- *  able to take some arbitrary object 'x' and obtain the most precise
- *  String for which an injection of x.asInstanceOf[String] will
- *  be valid from both the JVM's and scala's perspectives.
- *
- *  "definition" is when you want strings like
- */
-trait TypeStrings {
-  private val ObjectClass = classOf[java.lang.Object]
-  private val primitives = Set[String]("byte", "char", "short", "int", "long", "float", "double", "boolean", "void")
-  private val primitiveMap = primitives.toList map { x =>
-    val key = x match {
-      case "void" => "Void"
-      case "int"  => "Integer"
-      case "char" => "Character"
-      case s      => s.capitalize
-    }
-    val value = x match {
-      case "void" => "Unit"
-      case s      => s.capitalize
-    }
-
-    ("java.lang." + key) -> ("scala." + value)
-  } toMap
-
-  def scalaName(s: String): String = {
-    if (s endsWith MODULE_SUFFIX_STRING) s.init + ".type"
-    else if (s == "void") "scala.Unit"
-    else if (primitives(s)) "scala." + s.capitalize
-    else primitiveMap.getOrElse(s, NameTransformer.decode(s))
-  }
-  // Trying to put humpty dumpty back together again.
-  def scalaName(clazz: JClass): String = {
-    val name      = clazz.getName
-    val isAnon    = clazz.isScalaAnonymous
-    val enclClass = clazz.getEnclosingClass
-    def enclPre   = enclClass.getName + MODULE_SUFFIX_STRING
-    def enclMatch = name startsWith enclPre
-
-    scalaName(
-      if (enclClass == null || isAnon || !enclMatch) name
-      else enclClass.getName + "." + (name stripPrefix enclPre)
-    )
-  }
-  def scalaName(ct: ClassTag[_]): String = scalaName(ct.runtimeClass)
-  def anyClass(x: Any): JClass          = if (x == null) null else x.getClass
-
-  private def brackets(tps: String*): String =
-    if (tps.isEmpty) ""
-    else tps.mkString("[", ", ", "]")
-
-  private def tvarString(tvar: TypeVariable[_]): String = tvarString(tvar.getBounds.toList)
-  private def tvarString(bounds: List[AnyRef]): String = {
-    val xs = bounds filterNot (_ == ObjectClass) collect { case x: JClass => x }
-    if (xs.isEmpty) "_"
-    else scalaName(xs.head)
-  }
-  private def tparamString(clazz: JClass): String = {
-    brackets(clazz.getTypeParameters map tvarString: _*)
-  }
-
-  private def tparamString[T: ru.TypeTag] : String = {
-    // [Eugene++ to Paul] needs review!!
-    def typeArguments: List[ru.Type] = ru.typeOf[T].typeArguments
-    // [Eugene++] todo. need to use not the `rootMirror`, but a mirror with the REPL's classloader
-    // how do I get to it? acquiring context classloader seems unreliable because of multithreading
-    def typeVariables: List[java.lang.Class[_]] = typeArguments map (targ => ru.rootMirror.runtimeClass(targ))
-    brackets(typeArguments map (jc => tvarString(List(jc))): _*)
-  }
-
-  /** Going for an overabundance of caution right now.  Later these types
-   *  can be a lot more precise, but right now the tags have a habit of
-   *  introducing material which is not syntactically valid as scala source.
-   *  When this happens it breaks the repl.  It would be nice if we mandated
-   *  that tag toString methods (or some other method, since it's bad
-   *  practice to rely on toString for correctness) generated the VALID string
-   *  representation of the type.
-   */
-  def fromTypedValue[T: ru.TypeTag : ClassTag](x: T): String = fromTag[T]
-  def fromValue(value: Any): String                          = if (value == null) "Null" else fromClazz(anyClass(value))
-  def fromClazz(clazz: JClass): String                       = scalaName(clazz) + tparamString(clazz)
-  def fromTag[T: ru.TypeTag : ClassTag] : String             = scalaName(classTag[T].runtimeClass) + tparamString[T]
-
-  /** Reducing fully qualified noise for some common packages.
-   */
-  def quieter(tpe: String, alsoStrip: String*): String = {
-    val transforms = List(
-      "scala.collection.immutable." -> "immutable.",
-      "scala.collection.mutable." -> "mutable.",
-      "scala.collection.generic." -> "generic.",
-      "java.lang." -> "jl.",
-      "scala.runtime." -> "runtime."
-    ) ++ (alsoStrip map (_ -> ""))
-
-    transforms.foldLeft(tpe) {
-      case (res, (k, v)) => res.replaceAll(k, v)
-    }
-  }
-
-  val typeTransforms = List(
-    "java.lang." -> "",
-    "scala.collection.immutable." -> "immutable.",
-    "scala.collection.mutable." -> "mutable.",
-    "scala.collection.generic." -> "generic."
-  )
-}
-
-object TypeStrings extends TypeStrings { }

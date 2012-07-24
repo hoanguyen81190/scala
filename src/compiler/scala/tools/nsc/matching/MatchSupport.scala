@@ -66,7 +66,7 @@ trait MatchSupport extends ast.TreeDSL { self: ParallelMatching =>
       case x                    =>  x.toString + " (" + x.getClass + ")"
     }
 
-    // Formatting for some error messages
+
     private val NPAD = 15
     def pad(s: String): String = "%%%ds" format (NPAD-1) format s
     def pad(s: Any): String = pad(s match {

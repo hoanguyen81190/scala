@@ -1,28 +1,18 @@
-/* NSC -- new Scala compiler
- * Copyright 2005-2011 LAMP/EPFL
- * @author Alexander Spoon
- */
-
 package scala.tools.nsc
 package interpreter
 
 import Predef.{ println => _, _ }
+import java.io.PrintWriter
 
-/**
- *  @author Moez A. Abdel-Gawad
- *  @author  Lex Spoon
- *  @version 1.2
- */
-class MyILoop(protected val out: JPrintWriter)
+class MyILoop(protected val out: PrintWriter)
   extends AnyRef
 {
-  def this() = this(new JPrintWriter(Console.out, true))
+  def this() = this(new PrintWriter(Console.out, true))
 
-  var in: InteractiveReader = _   // the input stream from which commands come
+  var in: SimpleReader = _   // the input stream from which commands come
   var settings: Settings = _
   var intp: IMain = _
 
-  /** Close the interpreter and set the var to null. */
   def closeInterpreter() {
     if (intp ne null) {
       intp.close()
@@ -30,29 +20,17 @@ class MyILoop(protected val out: JPrintWriter)
     }
   }
 
-  class MyILoopInterpreter extends IMain(settings, out) {
-    outer =>
-
-    override lazy val formatting = new Formatting {
-      def prompt = MyILoop.this.prompt
-    }
-
-  }
-
   def createInterpreter() {
-    intp = new MyILoopInterpreter
+    intp = new IMain(settings, out)
   }
 
-  private var currentPrompt = Properties.shellPromptString
-  def prompt = currentPrompt
-
+  def prompt = Properties.shellPromptString
 
   def loop() {
     def readOneLine() = {
       out.flush()
       in readLine prompt
     }
-    // return false if repl should exit
     def processLine(line: String): Boolean = {
       if (line eq null) false               // assume null means EOF
       intp.interpret(line)
@@ -64,7 +42,6 @@ class MyILoop(protected val out: JPrintWriter)
     }
     innerLoop()
   }
-
 
   def process(settings: Settings): Boolean = {
     this.settings = settings

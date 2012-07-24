@@ -42,7 +42,7 @@ class Parsed private (
 
   def isFirstDelimiter  = !isEmpty && isDelimiterChar(buffer.head)
   def isLastDelimiter   = !isEmpty && isDelimiterChar(buffer.last)
-  def firstIfDelimiter  = if (isFirstDelimiter) buffer.head.toString else ""
+
   def lastIfDelimiter   = if (isLastDelimiter) buffer.last.toString else ""
 
   def isQuoted = false // TODO
@@ -62,8 +62,5 @@ object Parsed {
   def apply(s: String, cursor: Int, delimited: Char => Boolean): Parsed =
     new Parsed(onull(s), cursor, delimited)
 
-  def dotted(s: String): Parsed = dotted(onull(s), onull(s).length)
-  def dotted(s: String, cursor: Int): Parsed = new Parsed(onull(s), cursor, _ == '.')
 
-  def undelimited(s: String, cursor: Int): Parsed = new Parsed(onull(s), cursor, _ => false)
 }
