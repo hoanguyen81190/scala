@@ -5,10 +5,8 @@
 package scala.tools.nsc
 package interpreter
 
-import scala.tools.nsc.io.{ File, AbstractFile }
+import scala.tools.nsc.io.{ AbstractFile }
 import util.ScalaClassLoader
-
-import scala.collection.{ mutable, immutable }
 
 /**
  * A class loader that loads files from a {@link scala.tools.nsc.io.AbstractFile}.

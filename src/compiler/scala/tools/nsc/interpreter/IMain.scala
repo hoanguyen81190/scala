@@ -11,11 +11,9 @@ import util.stringFromWriter
 import scala.reflect.internal.util._
 import java.net.URL
 import io.VirtualDirectory
-import scala.tools.nsc.io.AbstractFile
 import reporters._
 import scala.tools.util.PathResolver
 import scala.tools.nsc.util.ScalaClassLoader
-import scala.collection.{ mutable }
 import IMain._
 import java.lang.Class
 
@@ -26,7 +24,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   /** Leading with the eagerly evaluated.
    */
   val virtualDirectory: VirtualDirectory            = new VirtualDirectory("(memory)", None) // "directory" for classfiles
-  private var currentSettings: Settings             = initialSettings
   private var _initializeComplete                   = false     // compiler is initialized
 
   private var _classLoader: AbstractFileClassLoader = null                              // active classloader
@@ -41,7 +38,7 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     if (isInitializeComplete) global.classPath.asURLs
     else new PathResolver(settings).result.asURLs  // the compiler's classpath
     )
-  def settings = currentSettings
+  def settings = initialSettings
   def this(settings: Settings) = this(settings, new NewLinePrintWriter(new ConsoleWriter, true))
   def this() = this(new Settings())
 
@@ -91,10 +88,9 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     _classLoader = makeClassLoader()
     _classLoader
   }
-  private class TranslatingClassLoader(parent: ClassLoader) extends AbstractFileClassLoader(virtualDirectory, parent) {
-  }
+
   private def makeClassLoader(): AbstractFileClassLoader =
-    new TranslatingClassLoader(ScalaClassLoader fromURLs compilerClasspath)
+    new AbstractFileClassLoader(virtualDirectory, ScalaClassLoader fromURLs compilerClasspath)
 
 
   def compileSourcesKeepingRun(sources: SourceFile*) = {
@@ -115,13 +111,6 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
     }
     new Request(line, trees)
   }
-
-  // normalize non-public types so we don't see protected aliases like Self
-  def normalizeNonPublic(tp: Type) = tp match {
-    case TypeRef(_, sym, _) if sym.isAliasType && !sym.isPublic => tp.normalize
-    case _                                                      => tp
-  }
-
 
   def interpret(line: String): Boolean = {
     if (global == null) false
@@ -218,13 +207,10 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
       lineRep.readPath + ".`%s`".format(vname)
       )
 
-    def fullFlatName(name: String) =
-      lineRep.readPath + nme.NAME_JOIN_STRING + name
-
     def fullPath(vname: Name): String = fullPath(vname.toString)
 
     def toCompute = line
-    def lookupTypeOf(name: Name) = typeOf.getOrElse(name, typeOf(global.encode(name.toString)))
+//    def lookupTypeOf(name: Name) = typeOf.getOrElse(name, typeOf(global.encode(name.toString)))
 
     private object ObjectSourceCode extends CodeAssembler[MemberHandler] {
       val preamble = """
@@ -286,12 +272,10 @@ class IMain(initialSettings: Settings, protected val out: JPrintWriter) {
   }
 
   def cleanMemberDecl(owner: Symbol, member: Name): Type = afterTyper {
-    normalizeNonPublic {
       owner.info.nonPrivateDecl(member).tpe match {
         case NullaryMethodType(tp) => tp
         case tp                    => tp
       }
-    }
   }
 
   object exprTyper extends {

@@ -104,9 +104,9 @@ trait MemberHandlers {
     override def definesValue = true
 
     override def resultExtractionCode(req: Request): String = {
-      val isInternal = isUserVarName(name) && req.lookupTypeOf(name) == "Unit"
-      if (!mods.isPublic || isInternal) ""
-      else {
+//      val isInternal = isUserVarName(name) && req.lookupTypeOf(name) == "Unit"
+//      if (!mods.isPublic || isInternal) ""
+//      else {
         // if this is a lazy val we avoid evaluating it here
         val resultString =
           if (mods.isLazy) codegenln(false, "<lazy>")
@@ -117,7 +117,7 @@ trait MemberHandlers {
           else ""
 
         """ + "%s%s: %s = " + %s""".format(prettyName, vidString, string2code(req typeOf name), resultString)
-      }
+//      }
     }
   }
 
@@ -140,12 +140,12 @@ trait MemberHandlers {
       """val %s = %s""".format(name, lhs)
 
     /** Print out lhs instead of the generated varName */
-    override def resultExtractionCode(req: Request) = {
-      val lhsType = string2code(req lookupTypeOf name)
-      val res     = string2code(req fullPath name)
-
-      """ + "%s: %s = " + %s + "\n" """.format(lhs, lhsType, res) + "\n"
-    }
+//    override def resultExtractionCode(req: Request) = {
+//      val lhsType = string2code(req lookupTypeOf name)
+//      val res     = string2code(req fullPath name)
+//
+//      """ + "%s: %s = " + %s + "\n" """.format(lhs, lhsType, res) + "\n"
+//    }
   }
 
   class ModuleHandler(module: ModuleDef) extends MemberDefHandler(module) {

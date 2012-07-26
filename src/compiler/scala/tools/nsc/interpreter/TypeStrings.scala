@@ -6,8 +6,6 @@
 package scala.tools.nsc
 package interpreter
 
-import java.lang.{ reflect => r }
-import scala.reflect.NameTransformer
 import typechecker.DestructureTypes
 
 

@@ -15,7 +15,7 @@ trait ExprTyper {
   import global.{ reporter => _, Import => _, _ }
   import syntaxAnalyzer.{ UnitParser }
 
-  object codeParser extends { val global: repl.global.type = repl.global } with CodeHandlers[Tree] {
+  object codeParser extends { val global: repl.global.type = repl.global
     def applyRule[T](code: String, rule: UnitParser => T): T = {
       reporter.reset()
       val scanner = newUnitParser(code)

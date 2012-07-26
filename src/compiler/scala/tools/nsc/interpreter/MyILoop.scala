@@ -31,13 +31,9 @@ class MyILoop(protected val out: PrintWriter)
       out.flush()
       in readLine prompt
     }
-    def processLine(line: String): Boolean = {
-      if (line eq null) false               // assume null means EOF
-      intp.interpret(line)
-      true
-    }
+
     def innerLoop() {
-      if ( processLine(readOneLine()) )
+      if ( intp.interpret(readOneLine()) )
         innerLoop()
     }
     innerLoop()
