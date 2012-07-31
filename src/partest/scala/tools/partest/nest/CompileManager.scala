@@ -112,7 +112,6 @@ class DirectCompiler(val fileManager: FileManager) extends SimpleCompiler {
       case "scalap"       => ScalapTestFile.apply
       case "scalacheck"   => ScalaCheckTestFile.apply
       case "specialized"  => SpecializedTestFile.apply
-      case "instrumented" => InstrumentedTestFile.apply
       case "presentation" => PresentationTestFile.apply
       case "ant"          => AntTestFile.apply
     }

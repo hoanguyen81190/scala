@@ -221,12 +221,7 @@ trait Constants extends api.Constants {
       tag match {
         case NullTag   => "null"
         case StringTag => "\"" + escape(stringValue) + "\""
-        case ClazzTag  =>
-          def show(tpe: Type) = "classOf[" + signature(tpe) + "]"
-          typeValue match {
-            case ErasedValueType(orig) => show(orig)
-            case _ => show(typeValue)
-          }
+        case ClazzTag  => "classOf[" + signature(typeValue) + "]"
         case CharTag   => "'" + escapedChar(charValue) + "'"
         case LongTag   => longValue.toString() + "L"
         case EnumTag   => symbolValue.name.toString()

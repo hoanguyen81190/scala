@@ -5,24 +5,13 @@ abstract class Universe extends scala.reflect.api.Universe {
 
   val treeBuild: TreeBuilder { val global: Universe.this.type }
 
-  trait AttachableApi {
-    /** ... */
-    def attachments: base.Attachments { type Pos = Position }
-
-    /** ... */
-    def addAttachment(attachment: Any): AttachableApi.this.type
-
-    /** ... */
-    def removeAttachment[T: ClassTag]: AttachableApi.this.type
-  }
-
   // Symbol extensions ---------------------------------------------------------------
 
   override type Symbol >: Null <: SymbolContextApi
 
   /** The extended API of symbols that's supported in macro context universes
    */
-  trait SymbolContextApi extends SymbolApi with AttachableApi { this: Symbol =>
+  trait SymbolContextApi extends SymbolApi { this: Symbol =>
 
     // [Eugene++ to Martin] should we also add mutability methods here (similarly to what's done below for trees)?
     // I'm talking about `setAnnotations` and friends
@@ -34,7 +23,7 @@ abstract class Universe extends scala.reflect.api.Universe {
 
   /** The extended API of trees that's supported in macro context universes
    */
-  trait TreeContextApi extends TreeApi with AttachableApi { this: Tree =>
+  trait TreeContextApi extends TreeApi { this: Tree =>
 
     /** ... */
     def pos_=(pos: Position): Unit
@@ -73,6 +62,15 @@ abstract class Universe extends scala.reflect.api.Universe {
 
     /** ... */
     def setSymbol(sym: Symbol): this.type
+
+    /** ... */
+    def attachments: base.Attachments { type Pos = Position }
+
+    /** ... */
+    def addAttachment(attachment: Any): this.type
+
+    /** ... */
+    def removeAttachment[T: ClassTag]: this.type
   }
 
   override type SymTree >: Null <: Tree with SymTreeContextApi

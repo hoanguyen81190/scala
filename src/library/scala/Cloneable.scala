@@ -6,9 +6,11 @@
 **                          |/                                          **
 \*                                                                      */
 
+
+
 package scala
 
 /**
- * Classes extending this trait are cloneable across platforms (Java, .NET).
+ * An annotation that designates the class to which it is applied as cloneable
  */
-trait Cloneable extends java.lang.Cloneable
+class cloneable extends annotation.StaticAnnotation

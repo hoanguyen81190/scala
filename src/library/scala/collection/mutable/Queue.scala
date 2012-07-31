@@ -30,6 +30,7 @@ import generic._
  *  @define mayNotTerminateInf
  *  @define willNotTerminateInf
  */
+@cloneable
 class Queue[A]
 extends MutableList[A]
    with GenericTraversableTemplate[A, Queue]

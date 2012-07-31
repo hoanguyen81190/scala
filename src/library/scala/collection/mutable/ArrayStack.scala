@@ -59,7 +59,7 @@ object ArrayStack extends SeqFactory[ArrayStack] {
  *  @define mayNotTerminateInf
  *  @define willNotTerminateInf
  */
-@SerialVersionUID(8565219180626620510L)
+@cloneable @SerialVersionUID(8565219180626620510L)
 class ArrayStack[T] private(private var table : Array[AnyRef],
                             private var index : Int)
 extends AbstractSeq[T]

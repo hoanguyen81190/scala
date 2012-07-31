@@ -276,7 +276,7 @@ object Future {
     }.map(_.result)
 
   /**
-   * Captures a block that will be transformed into 'Continuation Passing Style' using Scala's Delimited
+   * Captures a block that will be transformed into 'Continuation Passing Style' using
    * Continuations plugin.
    *
    * Within the block, the result of a Future may be accessed by calling Future.apply. At that point
@@ -289,7 +289,7 @@ object Future {
    * Completing a Future using 'CompletableFuture << Future' will also suspend execution until the
    * value of the other Future is available.
    *
-   * The Delimited Continuations compiler plugin must be enabled in order to use this method.
+   * The Continuations compiler plugin must be enabled in order to use this method.
    */
   def flow[A](body: => A @cps[Future[Any]], timeout: Long = Actor.TIMEOUT): Future[A] = {
     val future = Promise[A](timeout)
@@ -308,7 +308,7 @@ object Future {
 sealed trait Future[+T] {
 
   /**
-   * For use only within a Future.flow block or another compatible Delimited Continuations reset block.
+   * For use only within a Future.flow block or another compatible Continuations reset block.
    *
    * Returns the result of this Future without blocking, by suspending execution and storing it as a
    * continuation until the result is available.

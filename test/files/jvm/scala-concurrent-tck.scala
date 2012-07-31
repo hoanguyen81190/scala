@@ -3,19 +3,22 @@ import scala.concurrent.{
   Promise,
   TimeoutException,
   SyncVar,
-  ExecutionException,
-  ExecutionContext
+  ExecutionException
 }
-import scala.concurrent.{ future, promise, blocking }
+import scala.concurrent.future
+import scala.concurrent.promise
+import scala.concurrent.blocking
 import scala.util.{ Try, Success, Failure }
+
 import scala.concurrent.util.Duration
+
 
 trait TestBase {
   
   def once(body: (() => Unit) => Unit) {
     val sv = new SyncVar[Boolean]
     body(() => sv put true)
-    sv.take(2000)
+    sv.take()
   }
   
   // def assert(cond: => Boolean) {
@@ -30,8 +33,7 @@ trait TestBase {
 
 
 trait FutureCallbacks extends TestBase {
-  import ExecutionContext.Implicits._
-
+  
   def testOnSuccess(): Unit = once {
     done =>
     var x = 0
@@ -145,7 +147,6 @@ trait FutureCallbacks extends TestBase {
 
 
 trait FutureCombinators extends TestBase {
-  import ExecutionContext.Implicits._
 
   def testMapSuccess(): Unit = once {
     done =>
@@ -590,8 +591,7 @@ trait FutureCombinators extends TestBase {
 
 
 trait FutureProjections extends TestBase {
-  import ExecutionContext.Implicits._
-
+  
   def testFailedFailureOnComplete(): Unit = once {
     done =>
     val cause = new RuntimeException
@@ -673,8 +673,7 @@ trait FutureProjections extends TestBase {
 
 
 trait Blocking extends TestBase {
-  import ExecutionContext.Implicits._
-
+  
   def testAwaitSuccess(): Unit = once {
     done =>
     val f = future { 0 }
@@ -703,67 +702,8 @@ trait Blocking extends TestBase {
   
 }
 
-trait BlockContexts extends TestBase {
-  import ExecutionContext.Implicits._
-  import scala.concurrent.{ Await, Awaitable, BlockContext }
-
-  private def getBlockContext(body: => BlockContext): BlockContext = {
-    blocking(Future { body }, Duration(500, "ms"))
-  }
-
-  // test outside of an ExecutionContext
-  def testDefaultOutsideFuture(): Unit = {
-    val bc = BlockContext.current
-    assert(bc.getClass.getName.contains("DefaultBlockContext"))
-  }
-
-  // test BlockContext in our default ExecutionContext
-  def testDefaultFJP(): Unit = {
-    val bc = getBlockContext(BlockContext.current)
-    assert(bc.isInstanceOf[scala.concurrent.forkjoin.ForkJoinWorkerThread])
-  }
-
-  // test BlockContext inside BlockContext.withBlockContext
-  def testPushCustom(): Unit = {
-    val orig = BlockContext.current
-    val customBC = new BlockContext() {
-      override def internalBlockingCall[T](awaitable: Awaitable[T], atMost: Duration): T =
-        orig.internalBlockingCall(awaitable, atMost)
-    }
-
-    val bc = getBlockContext({
-      BlockContext.withBlockContext(customBC) {
-        BlockContext.current
-      }
-    })
-
-    assert(bc eq customBC)
-  }
-
-  // test BlockContext after a BlockContext.push
-  def testPopCustom(): Unit = {
-    val orig = BlockContext.current
-    val customBC = new BlockContext() {
-      override def internalBlockingCall[T](awaitable: Awaitable[T], atMost: Duration): T =
-        orig.internalBlockingCall(awaitable, atMost)
-    }
-
-    val bc = getBlockContext({
-      BlockContext.withBlockContext(customBC) {}
-      BlockContext.current
-    })
-
-    assert(bc ne customBC)
-  }
-
-  testDefaultOutsideFuture()
-  testDefaultFJP()
-  testPushCustom()
-  testPopCustom()
-}
 
 trait Promises extends TestBase {
-  import ExecutionContext.Implicits._
 
   def testSuccess(): Unit = once {
     done =>
@@ -790,8 +730,7 @@ trait Promises extends TestBase {
 
 
 trait Exceptions extends TestBase {
-  import ExecutionContext.Implicits._
-
+  
 }
 
 // trait TryEitherExtractor extends TestBase {
@@ -872,7 +811,7 @@ trait Exceptions extends TestBase {
 trait CustomExecutionContext extends TestBase {
   import scala.concurrent.{ ExecutionContext, Awaitable }
 
-  def defaultEC = ExecutionContext.global
+  def defaultEC = ExecutionContext.defaultExecutionContext
 
   val inEC = new java.lang.ThreadLocal[Int]() {
     override def initialValue = 0
@@ -887,7 +826,7 @@ trait CustomExecutionContext extends TestBase {
     val _count = new java.util.concurrent.atomic.AtomicInteger(0)
     def count = _count.get
 
-    def delegate = ExecutionContext.global
+    def delegate = ExecutionContext.defaultExecutionContext
 
     override def execute(runnable: Runnable) = {
       _count.incrementAndGet()
@@ -904,6 +843,9 @@ trait CustomExecutionContext extends TestBase {
       delegate.execute(wrapper)
     }
 
+    override def internalBlockingCall[T](awaitable: Awaitable[T], atMost: Duration): T =
+      delegate.internalBlockingCall(awaitable, atMost)
+
     override def reportFailure(t: Throwable): Unit = {
       System.err.println("Failure: " + t.getClass.getSimpleName + ": " + t.getMessage)
       delegate.reportFailure(t)
@@ -918,16 +860,14 @@ trait CustomExecutionContext extends TestBase {
 
   def testOnSuccessCustomEC(): Unit = {
     val count = countExecs { implicit ec =>
-      blocking {
-        once { done =>
-          val f = future({ assertNoEC() })(defaultEC)
-          f onSuccess {
-            case _ =>
-              assertEC()
+      once { done =>
+        val f = future({ assertNoEC() })(defaultEC)
+        f onSuccess {
+          case _ =>
+            assertEC()
             done()
-          }
-          assertNoEC()
         }
+        assertNoEC()
       }
     }
 
@@ -937,14 +877,12 @@ trait CustomExecutionContext extends TestBase {
 
   def testKeptPromiseCustomEC(): Unit = {
     val count = countExecs { implicit ec =>
-      blocking {
-        once { done =>
-          val f = Promise.successful(10).future
-          f onSuccess {
-            case _ =>
-              assertEC()
+      once { done =>
+        val f = Promise.successful(10).future
+        f onSuccess {
+          case _ =>
+            assertEC()
             done()
-          }
         }
       }
     }
@@ -955,30 +893,28 @@ trait CustomExecutionContext extends TestBase {
 
   def testCallbackChainCustomEC(): Unit = {
     val count = countExecs { implicit ec =>
-      blocking {
-        once { done =>
-          assertNoEC()
-          val addOne = { x: Int => assertEC(); x + 1 }
-          val f = Promise.successful(10).future
-          f.map(addOne).filter { x =>
-             assertEC()
-             x == 11
-           } flatMap { x =>
-             Promise.successful(x + 1).future.map(addOne).map(addOne)
-           } onComplete {
-            case Left(t) =>
-              try {
-                throw new AssertionError("error in test: " + t.getMessage, t)
-              } finally {
-                done()
-              }
-            case Right(x) =>
-              assertEC()
-              assert(x == 14)
+      once { done =>
+        assertNoEC()
+        val addOne = { x: Int => assertEC(); x + 1 }
+        val f = Promise.successful(10).future
+        f.map(addOne).filter { x =>
+           assertEC()
+           x == 11
+         } flatMap { x =>
+           Promise.successful(x + 1).future.map(addOne).map(addOne)
+         } onComplete {
+          case Left(t) =>
+            try {
+              throw new AssertionError("error in test: " + t.getMessage, t)
+            } finally {
               done()
-          }
-          assertNoEC()
+            }
+          case Right(x) =>
+            assertEC()
+            assert(x == 14)
+            done()
         }
+        assertNoEC()
       }
     }
 
@@ -998,7 +934,6 @@ with FutureCallbacks
 with FutureCombinators
 with FutureProjections
 with Promises
-with BlockContexts
 with Exceptions
 // with TryEitherExtractor
 with CustomExecutionContext

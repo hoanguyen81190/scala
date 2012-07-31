@@ -658,7 +658,7 @@ trait JavaMirrors extends internal.SymbolTable with api.JavaUniverse { self: Sym
       val ownerModule: ModuleSymbol =
         if (split > 0) packageNameToScala(fullname take split) else this.RootPackage
       val owner = ownerModule.moduleClass
-      val name = (fullname: TermName) drop split + 1
+      val name = newTermName(fullname drop (split + 1))
       val opkg = owner.info decl name
       if (opkg.isPackage)
         opkg.asModuleSymbol
@@ -999,10 +999,10 @@ trait JavaMirrors extends internal.SymbolTable with api.JavaUniverse { self: Sym
     mirrors(rootToLoader getOrElseUpdate(root, findLoader)).get.get
   }
 
-  private lazy val magicSymbols: Map[(String, Name), Symbol] = {
-    def mapEntry(sym: Symbol): ((String, Name), Symbol) = (sym.owner.fullName, sym.name) -> sym
-    Map() ++ (definitions.magicSymbols filter (_.isClass) map mapEntry)
-  }
+  private def byName(sym: Symbol): (Name, Symbol) = sym.name -> sym
+
+  private lazy val phantomTypes: Map[Name, Symbol] =
+    Map(byName(definitions.AnyRefClass)) ++ (definitions.isPhantomClass map byName)
 
   /** 1. If `owner` is a package class (but not the empty package) and `name` is a term name, make a new package
    *  <owner>.<name>, otherwise return NoSymbol.
@@ -1020,12 +1020,13 @@ trait JavaMirrors extends internal.SymbolTable with api.JavaUniverse { self: Sym
       if (name.isTermName && !owner.isEmptyPackageClass)
         return mirror.makeScalaPackage(
           if (owner.isRootSymbol) name.toString else owner.fullName+"."+name)
-      magicSymbols get (owner.fullName, name) match {
-        case Some(tsym) =>
-          owner.info.decls enter tsym
-          return tsym
-        case None =>
-      }
+      if (owner.name.toTermName == nme.scala_ && owner.owner.isRoot)
+        phantomTypes get name match {
+          case Some(tsym) =>
+            owner.info.decls enter tsym
+            return tsym
+          case None =>
+        }
     }
     info("*** missing: "+name+"/"+name.isTermName+"/"+owner+"/"+owner.hasPackageFlag+"/"+owner.info.decls.getClass)
     super.missingHook(owner, name)

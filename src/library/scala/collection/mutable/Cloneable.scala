@@ -17,6 +17,9 @@ package mutable
  *
  *  @tparam A    Type of the elements contained in the collection, covariant and with reference types as upperbound.
  */
-trait Cloneable[+A <: AnyRef] extends scala.Cloneable {
+@cloneable
+trait Cloneable[+A <: AnyRef] {
+  // !!! why doesn't this extend java.lang.Cloneable?
+  //     because neither did @serializable, then we changed it to Serializable
   override def clone: A = super.clone().asInstanceOf[A]
 }

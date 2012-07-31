@@ -1,7 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d55178af-dc3d-41fc-adca-f217b429df70" name="Default" comment="" />
+    <list default="true" id="11b398fc-bd31-428c-8238-1696d998a98a" name="Default" comment="">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ILoop.scala" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\InterpreterLoop.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\AbstractOrMissingHandler.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ByteCode.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\CodeHandlers.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\CommandLine.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Completion.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\CompletionAware.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\CompletionOutput.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ConsoleReaderHelper.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Delimited.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Formatting.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ISettings.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Imports.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\InteractiveReader.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\JLineCompletion.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\JLineReader.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Logger.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\LoopCommands.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\MyILoop.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\MyILoopInit.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\NamedParam.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Parsed.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Pasted.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Phased.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Power.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ReplConfig.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ReplGlobal.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ReplProps.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ReplReporter.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ReplStrings.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\ReplVals.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\Results.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\RichClass.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\SimpleReader.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\package.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\session\FileBackedHistory.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\session\History.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\session\JLineHistory.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\session\SimpleHistory.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter\session\package.scala" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\actors.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\compiler.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\library.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\manual.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\partest.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\reflect.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\scala-lang.ipr.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\scala.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\scalap.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\swing.iml.SAMPLE" afterPath="" />
+      <change type="DELETED" beforePath="C:\Users\HP-dv6\scala\src\intellij\test.iml.SAMPLE" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/Global.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/Global.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/MainGenericRunner.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/MainGenericRunner.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/MyREPL.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/MyREPL.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interactive/REPL.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interactive/REPL.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ExprTyper.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ExprTyper.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/IMain.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/IMain.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/MemberHandlers.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/MemberHandlers.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/Naming.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/Naming.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/TypeStrings.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/TypeStrings.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/matching/MatchSupport.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/matching/MatchSupport.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/settings/ScalaSettings.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/settings/ScalaSettings.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/nsc/util/ShowPickled.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/nsc/util/ShowPickled.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../compiler/scala/tools/reflect/StdTags.scala" afterPath="$PROJECT_DIR$/../compiler/scala/tools/reflect/StdTags.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../partest/scala/tools/partest/ReplTest.scala" afterPath="$PROJECT_DIR$/../partest/scala/tools/partest/ReplTest.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../reflect/scala/reflect/internal/Symbols.scala" afterPath="$PROJECT_DIR$/../reflect/scala/reflect/internal/Symbols.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../test/disabled/presentation/akka/src/akka/dispatch/Future.scala" afterPath="$PROJECT_DIR$/../../test/disabled/presentation/akka/src/akka/dispatch/Future.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../test/files/pos/t5604/ReplConfig.scala" afterPath="$PROJECT_DIR$/../../test/files/pos/t5604/ReplConfig.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../test/files/pos/t5604/ReplReporter.scala" afterPath="$PROJECT_DIR$/../../test/files/pos/t5604/ReplReporter.scala" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../../test/files/run/treePrint.scala" afterPath="$PROJECT_DIR$/../../test/files/run/treePrint.scala" />
+    </list>
     <ignored path="scala-lang.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,6 +91,21 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
+    <line_breakpoints>
+      <breakpoint url="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/backend/icode/GenICode.scala" line="23" class="scala.tools.nsc.backend.icode.GenICode" package="scala.tools.nsc.backend.icode">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+    </line_breakpoints>
     <breakpoint_any>
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -56,8 +144,145 @@
   <component name="FavoritesManager">
     <favorites_list name="scala-lang" />
   </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="AbstractFileClassLoader.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="43" column="47" selection-start="1182" selection-end="1182" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#112#154#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MemberHandlers.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/MemberHandlers.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="120" column="12" selection-start="4665" selection-end="4665" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MainGenericRunner.scala" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/MainGenericRunner.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="12" column="25" selection-start="312" selection-end="312" vertical-scroll-proportion="0.37845305">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ILoop.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ILoop.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="46" column="12" selection-start="842" selection-end="842" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IMain.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/IMain.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="20" column="90" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Macros.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/typechecker/Macros.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="773" column="92" selection-start="36434" selection-end="36434" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Evals.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Evals.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="1" selection-start="544" selection-end="544" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="e#45#90#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Infrastructure.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Infrastructure.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="45" column="0" selection-start="1427" selection-end="1427" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ReplTest.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../partest/scala/tools/partest/ReplTest.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="29" column="24" selection-start="939" selection-end="939" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="MyREPL.scala" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/MyREPL.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="7" column="20" selection-start="134" selection-end="134" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="n#!!doc" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="expandStates">
+      <map>
+        <entry key="scala-lang" value="true" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/Trees.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/Symbols.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/TypeStrings.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ExprTyper.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/IMain.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interactive/REPL.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/settings/ScalaSettings.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/MyILoop.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/MemberHandlers.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Evals.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Infrastructure.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ILoop.scala" />
+        <option value="$PROJECT_DIR$/../partest/scala/tools/partest/ReplTest.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/MyREPL.scala" />
+        <option value="$PROJECT_DIR$/../compiler/scala/tools/nsc/MainGenericRunner.scala" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState />
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
@@ -79,7 +304,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1" splitterProportion="0.5">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -90,17 +315,273 @@
       <autoscrollFromSource />
       <sortByType />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="PackagesPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="partest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="partest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="partest" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="compiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="compiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="compiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nsc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="compiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tools" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="nsc" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="interpreter" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala-lang" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="compiler" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="scala" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="options.lastSelected" value="Template Data Languages" />
+    <property name="last_opened_file_path" value="D:/scala/scala/src/intellij" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="dynamic.classpath" value="false" />
   </component>
-  <component name="RunManager">
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\HP-dv6\scala\src\compiler\scala\tools\nsc\interpreter" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.MyREPL">
+    <configuration default="false" name="REPL" type="Application" factoryName="Application" temporary="true">
+      <option name="MAIN_CLASS_NAME" value="scala.tools.nsc.interactive.REPL" />
+      <option name="VM_PARAMETERS" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="compiler" />
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
     <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
       <module name="" />
       <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m" />
@@ -218,44 +699,101 @@
         <option name="Maven.BeforeRunTask" enabled="false" />
       </method>
     </configuration>
-    <list size="0" />
+    <configuration default="true" type="ScalaScriptRunConfiguration" factoryName="Scala Script">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="consoleargs" value="" />
+      <setting name="params" value="" />
+      <setting name="workingDirectory" value="$PROJECT_DIR$" />
+      <method>
+        <option name="AntTarget" enabled="false" />
+        <option name="BuildArtifacts" enabled="false" />
+        <option name="Make" enabled="true" />
+        <option name="Maven.BeforeRunTask" enabled="false" />
+      </method>
+    </configuration>
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="Application.MainGenericRunner" />
+      <item index="1" class="java.lang.String" itemvalue="Application.REPL" />
+      <item index="2" class="java.lang.String" itemvalue="Application.MyREPL" />
+    </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
       <Port>5050</Port>
     </configuration>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="DETECT_NESTED_COPIES" value="true" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <configuration useDefault="false">C:\Users\HP-dv6\AppData\Roaming\Subversion</configuration>
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="d55178af-dc3d-41fc-adca-f217b429df70" name="Default" comment="" />
-      <created>1343123211517</created>
-      <updated>1343123211517</updated>
+      <changelist id="11b398fc-bd31-428c-8238-1696d998a98a" name="Default" comment="" />
+      <created>1341734900718</created>
+      <updated>1341734900718</updated>
     </task>
     <servers />
   </component>
+  <component name="TodoView" selected-index="0">
+    <todo-panel id="selected-file">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="default-changelist">
+      <are-packages-shown value="false" />
+      <are-modules-shown value="false" />
+      <flatten-packages value="false" />
+      <is-autoscroll-to-source value="false" />
+    </todo-panel>
+  </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="7" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4280822" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32897195" sideWeight="0.6940966" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2739726" sideWeight="0.904328" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.08561644" sideWeight="0.91495824" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2791096" sideWeight="0.09035687" order="10" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
-      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40318906" sideWeight="0.23972602" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32953683" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40318906" sideWeight="0.57191783" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28549734" sideWeight="0.72602737" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20376712" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32876712" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24981017" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -312,6 +850,216 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/ast/parser/Parsers.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2930" column="74" selection-start="103764" selection-end="103764" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/Global.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1565" column="31" selection-start="62835" selection-end="62835" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Context.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="18" selection-start="94" selection-end="94" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/reflect/ToolBoxFactory.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="58" selection-start="1319" selection-end="1319" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#37#71#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interactive/REPL.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="261" column="76" selection-start="593" selection-end="10226" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/settings/ScalaSettings.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="196" column="10" selection-start="15675" selection-end="15675" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/IMain.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="20" column="90" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="43" column="47" selection-start="1182" selection-end="1182" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#112#154#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/MemberHandlers.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="120" column="12" selection-start="4665" selection-end="4665" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/typechecker/Macros.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="773" column="92" selection-start="36434" selection-end="36434" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Evals.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="1" selection-start="544" selection-end="544" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#45#90#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/reflect/makro/runtime/Infrastructure.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="0" selection-start="1427" selection-end="1427" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/interpreter/ILoop.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="12" selection-start="842" selection-end="842" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../partest/scala/tools/partest/ReplTest.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="24" selection-start="939" selection-end="939" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/MyREPL.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="20" selection-start="134" selection-end="134" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="n#!!doc" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../compiler/scala/tools/nsc/MainGenericRunner.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="25" selection-start="312" selection-end="312" vertical-scroll-proportion="0.37845305">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Scala (swing)|Scala</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.7</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>compiler</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>lib</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
 

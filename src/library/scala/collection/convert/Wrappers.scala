@@ -467,5 +467,4 @@ private[collection] trait Wrappers {
   }
 }
 
-@SerialVersionUID(0 - 5857859809262781311L)
-object Wrappers extends Wrappers with Serializable
+object Wrappers extends Wrappers

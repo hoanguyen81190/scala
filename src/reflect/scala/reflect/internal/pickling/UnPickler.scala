@@ -373,7 +373,12 @@ abstract class UnPickler /*extends reflect.generic.UnPickler*/ {
             NullaryMethodType(restpe)
         case EXISTENTIALtpe =>
           val restpe  = readTypeRef()
-          newExistentialType(until(end, readSymbolRef), restpe)
+          // @PP: Where is the flag setting supposed to happen? I infer
+          // from the lack of flag setting in the rest of the unpickler
+          // that it isn't right here. See #4757 for the immediate
+          // motivation to fix it.
+          val tparams = until(end, readSymbolRef) map (_ setFlag EXISTENTIAL)
+          newExistentialType(tparams, restpe)
 
         case ANNOTATEDtpe =>
           var typeRef = readNat()
@@ -813,7 +818,7 @@ abstract class UnPickler /*extends reflect.generic.UnPickler*/ {
       throw new RuntimeException("malformed Scala signature of " + classRoot.name + " at " + readIndex + "; " + msg)
 
     protected def errorMissingRequirement(name: Name, owner: Symbol): Symbol =
-      mirrorThatLoaded(owner).missingHook(owner, name) orElse MissingRequirementError.signal(
+      missingHook(owner, name) orElse MissingRequirementError.signal(
         s"bad reference while unpickling $filename: ${name.longString} not found in ${owner.tpe.widen}"
       )
 
@@ -827,10 +832,8 @@ abstract class UnPickler /*extends reflect.generic.UnPickler*/ {
      *  Similar in intent to what SymbolLoader does (but here we don't have access to
      *  error reporting, so we rely on the typechecker to report the error).
      */
-    def toTypeError(e: MissingRequirementError) = {
-      // e.printStackTrace()
+    def toTypeError(e: MissingRequirementError) =
       new TypeError(e.msg)
-    }
 
     /** A lazy type which when completed returns type at index `i`. */
     private class LazyTypeRef(i: Int) extends LazyType {

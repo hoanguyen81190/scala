@@ -194,10 +194,7 @@ abstract class Enumeration (initial: Int) extends Serializable {
     /** a marker so we can tell whose values belong to whom come reflective-naming time */
     private[Enumeration] val outerEnum = thisenum
 
-    override def compare(that: Value): Int =
-      if (this.id < that.id) -1
-      else if (this.id == that.id) 0
-      else 1
+    override def compare(that: Value): Int = this.id - that.id
     override def equals(other: Any) = other match {
       case that: Enumeration#Value  => (outerEnum eq that.outerEnum) && (id == that.id)
       case _                        => false
@@ -239,7 +236,7 @@ abstract class Enumeration (initial: Int) extends Serializable {
 
   /** An ordering by id for values of this set */
   object ValueOrdering extends Ordering[Value] {
-    def compare(x: Value, y: Value): Int = x compare y
+    def compare(x: Value, y: Value): Int = x.id - y.id
   }
 
   /** A class for sets of values.

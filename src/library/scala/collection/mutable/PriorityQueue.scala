@@ -31,6 +31,7 @@ import generic._
  *  @define mayNotTerminateInf
  *  @define willNotTerminateInf
  */
+@cloneable
 class PriorityQueue[A](implicit val ord: Ordering[A])
    extends AbstractIterable[A]
       with Iterable[A]
@@ -39,7 +40,6 @@ class PriorityQueue[A](implicit val ord: Ordering[A])
       with Growable[A]
       with Builder[A, PriorityQueue[A]]
       with Serializable
-      with scala.Cloneable
 {
   import ord._
 

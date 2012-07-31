@@ -25,7 +25,7 @@ abstract class ReplTest extends DirectTest {
   def eval() = {
     val s = settings
     log("eval(): settings = " + s)
-    ILoop.runForTranscript(code, s).lines drop 1
+//    ILoop.runForTranscript(code, s).lines drop 1
   }
-  def show() = eval() foreach println
+  def show() = eval() //foreach println
 }

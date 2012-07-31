@@ -28,10 +28,10 @@ import generic._
  *  @define Coll `Buffer`
  *  @define coll buffer
  */
+@cloneable
 trait Buffer[A] extends Seq[A]
                    with GenericTraversableTemplate[A, Buffer]
-                   with BufferLike[A, Buffer[A]]
-                   with scala.Cloneable {
+                   with BufferLike[A, Buffer[A]] {
   override def companion: GenericCompanion[Buffer] = Buffer
 }
 

@@ -368,7 +368,6 @@ trait Definitions extends api.StandardDefinitions {
     lazy val SerializableClass     = requiredClass[scala.Serializable]
     lazy val JavaSerializableClass = requiredClass[java.io.Serializable] modifyInfo fixupAsAnyTrait
     lazy val ComparableClass       = requiredClass[java.lang.Comparable[_]] modifyInfo fixupAsAnyTrait
-    lazy val CloneableClass        = requiredClass[scala.Cloneable]
     lazy val JavaCloneableClass    = requiredClass[java.lang.Cloneable]
     lazy val JavaNumberClass       = requiredClass[java.lang.Number]
     lazy val RemoteInterfaceClass  = requiredClass[java.rmi.Remote]
@@ -496,9 +495,6 @@ trait Definitions extends api.StandardDefinitions {
          def MacroInternal_materializeClassTag   = getMemberMethod(MacroInternalPackage, nme.materializeClassTag)
          def MacroInternal_materializeAbsTypeTag = getMemberMethod(MacroInternalPackage, nme.materializeAbsTypeTag)
          def MacroInternal_materializeTypeTag    = getMemberMethod(MacroInternalPackage, nme.materializeTypeTag)
-
-    lazy val StringContextClass                  = requiredClass[scala.StringContext]
-         def StringContext_f                     = getMemberMethod(StringContextClass, nme.f)
 
     lazy val ScalaSignatureAnnotation = requiredClass[scala.reflect.ScalaSignature]
     lazy val ScalaLongSignatureAnnotation = requiredClass[scala.reflect.ScalaLongSignature]
@@ -904,7 +900,7 @@ trait Definitions extends api.StandardDefinitions {
 
     lazy val BeanPropertyAttr           = requiredClass[scala.beans.BeanProperty]
     lazy val BooleanBeanPropertyAttr    = requiredClass[scala.beans.BooleanBeanProperty]
-    lazy val CloneableAttr              = requiredClass[scala.annotation.cloneable]
+    lazy val CloneableAttr              = requiredClass[scala.cloneable]
     lazy val DeprecatedAttr             = requiredClass[scala.deprecated]
     lazy val DeprecatedNameAttr         = requiredClass[scala.deprecatedName]
     lazy val NativeAttr                 = requiredClass[scala.native]
@@ -1129,39 +1125,6 @@ trait Definitions extends api.StandardDefinitions {
 
     /** Is symbol a phantom class for which no runtime representation exists? */
     lazy val isPhantomClass = Set[Symbol](AnyClass, AnyValClass, NullClass, NothingClass)
-    lazy val magicSymbols = List(
-      AnnotationDefaultAttr, // #2264
-      RepeatedParamClass,
-      JavaRepeatedParamClass,
-      ByNameParamClass,
-      AnyClass,
-      AnyRefClass,
-      AnyValClass,
-      NullClass,
-      NothingClass,
-      SingletonClass,
-      EqualsPatternClass,
-      Any_==,
-      Any_!=,
-      Any_equals,
-      Any_hashCode,
-      Any_toString,
-      Any_getClass,
-      Any_isInstanceOf,
-      Any_asInstanceOf,
-      Any_##,
-      Object_eq,
-      Object_ne,
-      Object_==,
-      Object_!=,
-      Object_##,
-      Object_synchronized,
-      Object_isInstanceOf,
-      Object_asInstanceOf,
-      String_+,
-      ComparableClass,
-      JavaSerializableClass
-    )
 
     /** Is the symbol that of a parent which is added during parsing? */
     lazy val isPossibleSyntheticParent = ProductClass.toSet[Symbol] + ProductRootClass + SerializableClass
@@ -1225,7 +1188,41 @@ trait Definitions extends api.StandardDefinitions {
 
     def init() {
       if (isInitialized) return
-      val forced = magicSymbols // force initialization of every symbol that is entered as a side effect
+
+      val forced = List( // force initialization of every symbol that is entered as a side effect
+        AnnotationDefaultAttr, // #2264
+        RepeatedParamClass,
+        JavaRepeatedParamClass,
+        ByNameParamClass,
+        AnyClass,
+        AnyRefClass,
+        AnyValClass,
+        NullClass,
+        NothingClass,
+        SingletonClass,
+        EqualsPatternClass,
+        Any_==,
+        Any_!=,
+        Any_equals,
+        Any_hashCode,
+        Any_toString,
+        Any_getClass,
+        Any_isInstanceOf,
+        Any_asInstanceOf,
+        Any_##,
+        Object_eq,
+        Object_ne,
+        Object_==,
+        Object_!=,
+        Object_##,
+        Object_synchronized,
+        Object_isInstanceOf,
+        Object_asInstanceOf,
+        String_+,
+        ComparableClass,
+        JavaSerializableClass
+      )
+
       isInitialized = true
     } //init
 

@@ -6,11 +6,10 @@
 package scala.reflect
 package internal
 
-import scala.collection.{ mutable, immutable }
+import scala.collection.{immutable }
 import scala.collection.mutable.ListBuffer
 import util.Statistics
 import Flags._
-import base.Attachments
 
 trait Symbols extends api.Symbols { self: SymbolTable =>
   import definitions._
@@ -83,280 +82,71 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     def getAnnotations: List[AnnotationInfo] = { initialize; annotations }
     def setAnnotations(annots: AnnotationInfo*): this.type = { setAnnotations(annots.toList); this }
 
-    def resolveOverloaded(
-      pre: Type,
-      targs: Seq[Type],
-      posVargTypes: Seq[Type],
-      nameVargTypes: Seq[(TermName, Type)],
-      expected: Type
-    ): Symbol = {
+    private def lastElemType(ts: Seq[Type]): Type = ts.last.normalize.typeArgs.head
 
-      // Begin Correlation Helpers
+    private def formalTypes(formals: List[Type], nargs: Int): List[Type] = {
+      val formals1 = formals mapConserve {
+        case TypeRef(_, ByNameParamClass, List(arg)) => arg
+        case formal => formal
+      }
+      if (isVarArgTypes(formals1)) {
+        val ft = lastElemType(formals)
+        formals1.init ::: List.fill(nargs - (formals1.length - 1))(ft)
+      } else formals1
+    }
 
-      def isCompatible(tp: Type, pt: Type): Boolean = {
-        def isCompatibleByName(tp: Type, pt: Type): Boolean = pt match {
-          case TypeRef(_, ByNameParamClass, List(res)) if !definitions.isByNameParamType(tp) =>
-            isCompatible(tp, res)
-          case _ =>
+    def resolveOverloaded(pre: Type, targs: Seq[Type], actuals: Seq[Type]): Symbol = {
+      def firstParams(tpe: Type): (List[Symbol], List[Type]) = tpe match {
+        case PolyType(tparams, restpe) =>
+          val (Nil, formals) = firstParams(restpe)
+          (tparams, formals)
+        case MethodType(params, _) =>
+          (Nil, params map (_.tpe))
+        case _ =>
+          (Nil, Nil)
+      }
+      def isApplicable(alt: Symbol, targs: List[Type], actuals: Seq[Type]) = {
+        def isApplicableType(tparams: List[Symbol], tpe: Type): Boolean = {
+          val (tparams, formals) = firstParams(pre memberType alt)
+          val formals1 = formalTypes(formals, actuals.length)
+          val actuals1 =
+            if (isVarArgTypes(actuals)) {
+              if (!isVarArgTypes(formals)) return false
+              actuals.init :+ lastElemType(actuals)
+            } else actuals
+          if (formals1.length != actuals1.length) return false
+
+          if (tparams.isEmpty) return (actuals1 corresponds formals1)(_ <:< _)
+
+          if (targs.length == tparams.length)
+            isApplicableType(List(), tpe.instantiateTypeParams(tparams, targs))
+          else if (targs.nonEmpty)
             false
-        }
-        (tp weak_<:< pt) || isCompatibleByName(tp, pt)
-      }
-
-      def signatureAsSpecific(method1: MethodSymbol, method2: MethodSymbol): Boolean = {
-        (substituteTypeParams(method1), substituteTypeParams(method2)) match {
-          case (NullaryMethodType(r1), NullaryMethodType(r2)) =>
-            r1 weak_<:< r2
-          case (NullaryMethodType(_), MethodType(_, _)) =>
-            true
-          case (MethodType(_, _), NullaryMethodType(_)) =>
-            false
-          case (MethodType(p1, _), MethodType(p2, _)) =>
-            val len = p1.length max p2.length
-            val sub = extend(p1 map (_.typeSignature), len)
-            val sup = extend(p2 map (_.typeSignature), len)
-            (sub corresponds sup)(isCompatible)
-        }
-      }
-
-      def scopeMoreSpecific(method1: MethodSymbol, method2: MethodSymbol): Boolean = {
-        val o1 = method1.owner.asClassSymbol
-        val o2 = method2.owner.asClassSymbol
-        val c1 = if (o1.hasFlag(Flag.MODULE)) o1.companionSymbol else o1
-        val c2 = if (o2.hasFlag(Flag.MODULE)) o2.companionSymbol else o2
-        c1.typeSignature <:< c2.typeSignature
-      }
-
-      def moreSpecific(method1: MethodSymbol, method2: MethodSymbol): Boolean = {
-        def points(m1: MethodSymbol, m2: MethodSymbol) = {
-          val p1 = if (signatureAsSpecific(m1, m2)) 1 else 0
-          val p2 = if (scopeMoreSpecific(m1, m2)) 1 else 0
-          p1 + p2
-        }
-        points(method1, method2) > points(method2, method1)
-      }
-
-      def combineInto (
-        variadic: Boolean
-      )(
-        positional: Seq[Type],
-        named: Seq[(TermName, Type)]
-      )(
-        target: Seq[TermName],
-        defaults: Map[Int, Type]
-      ): Option[Seq[Type]] = {
-
-        val offset = positional.length
-        val unfilled = target.zipWithIndex drop offset
-        val canAcceptAllNameVargs = named forall { case (argName, _) =>
-          unfilled exists (_._1 == argName)
-        }
-
-        val paramNamesUnique = {
-          named.length == named.map(_._1).distinct.length
-        }
-
-        if (canAcceptAllNameVargs && paramNamesUnique) {
-
-          val rest = unfilled map { case (paramName, paramIndex) =>
-            val passedIn = named.collect {
-              case (argName, argType) if argName == paramName => argType
-            }.headOption
-            if (passedIn isDefined) passedIn
-            else defaults.get(paramIndex).map(_.asInstanceOf[Type])
-          }
-
-          val rest1 = {
-            if (variadic && !rest.isEmpty && !rest.last.isDefined) rest.init
-            else rest
-          }
-
-
-          if (rest1 forall (_.isDefined)) {
-            val joined = positional ++ rest1.map(_.get)
-            val repeatedCollapsed = {
-              if (variadic) {
-                val (normal, repeated) = joined.splitAt(target.length - 1)
-                if (repeated.forall(_ =:= repeated.head)) Some(normal ++ repeated.headOption)
-                else None
-              }
-              else Some(joined)
-            }
-            if (repeatedCollapsed.exists(_.length == target.length))
-              repeatedCollapsed
-            else if (variadic && repeatedCollapsed.exists(_.length == target.length - 1))
-              repeatedCollapsed
-            else None
-          } else None
-
-        } else None
-      }
-      
-      // Begin Reflection Helpers
-
-      // Replaces a repeated parameter type at the end of the parameter list
-      // with a number of non-repeated parameter types in order to pad the
-      // list to be nargs in length
-      def extend(types: Seq[Type], nargs: Int): Seq[Type] = {
-        if (isVarArgTypes(types)) {
-          val repeatedType = types.last.normalize.typeArgs.head
-          types.init ++ Seq.fill(nargs - (types.length - 1))(repeatedType)
-        } else types
-      }
-
-      // Replaces by-name parameters with their result type and
-      // TypeRefs with the thing they reference
-      def unwrap(paramType: Type): Type = paramType match {
-        case TypeRef(_, IntClass, _) => typeOf[Int]
-        case TypeRef(_, LongClass, _) => typeOf[Long]
-        case TypeRef(_, ShortClass, _) => typeOf[Short]
-        case TypeRef(_, ByteClass, _) => typeOf[Byte]
-        case TypeRef(_, CharClass, _) => typeOf[Char]
-        case TypeRef(_, FloatClass, _) => typeOf[Float]
-        case TypeRef(_, DoubleClass, _) => typeOf[Double]
-        case TypeRef(_, BooleanClass, _) => typeOf[Boolean]
-        case TypeRef(_, UnitClass, _) => typeOf[Unit]
-        case TypeRef(_, NullClass, _) => typeOf[Null]
-        case TypeRef(_, AnyClass, _) => typeOf[Any]
-        case TypeRef(_, NothingClass, _) => typeOf[Nothing]
-        case TypeRef(_, AnyRefClass, _) => typeOf[AnyRef]
-        case TypeRef(_, ByNameParamClass, List(resultType)) => unwrap(resultType)
-        case t: Type => t
-      }
-
-      // Gives the names of the parameters to a method
-      def paramNames(signature: Type): Seq[TermName] = signature match {
-        case PolyType(_, resultType) => paramNames(resultType)
-        case MethodType(params, _) => params.map(_.name.asInstanceOf[TermName])
-        case NullaryMethodType(_) => Seq.empty
-      }
-
-      def valParams(signature: Type): Seq[TermSymbol] = signature match {
-        case PolyType(_, resultType) => valParams(resultType)
-        case MethodType(params, _) => params.map(_.asTermSymbol)
-        case NullaryMethodType(_) => Seq.empty
-      }
-
-      // Returns a map from parameter index to default argument type
-      def defaultTypes(method: MethodSymbol): Map[Int, Type] = {
-        val typeSig = substituteTypeParams(method)
-        val owner = method.owner
-        valParams(typeSig).zipWithIndex.filter(_._1.hasFlag(Flag.DEFAULTPARAM)).map { case(_, index) =>
-          val name = nme.defaultGetterName(method.name.decodedName, index + 1)
-          val default = owner.asType member name
-          index -> default.typeSignature.asInstanceOf[NullaryMethodType].resultType
-        }.toMap
-      }
-
-      // True if any of method's parameters have default values. False otherwise.
-      def usesDefault(method: MethodSymbol): Boolean = valParams(method.typeSignature) drop(posVargTypes).length exists { param =>
-        (param hasFlag Flag.DEFAULTPARAM) && nameVargTypes.forall { case (argName, _) =>
-          param.name != argName
-        }
-      }
-
-      // The number of type parameters that the method takes
-      def numTypeParams(x: MethodSymbol): Int = {
-        x.typeSignature.typeParams.length
-      }
-
-      def substituteTypeParams(m: MethodSymbol): Type = {
-        (pre memberType m) match {
-          case m: MethodType => m
-          case n: NullaryMethodType => n
-          case PolyType(tparams, rest) => rest.substituteTypes(tparams, targs.toList)
-        }
-      }
-
-      // Begin Selection Helpers
-
-      def select(
-          alternatives: Seq[MethodSymbol],
-          filters: Seq[Seq[MethodSymbol] => Seq[MethodSymbol]]
-      ): Seq[MethodSymbol] =
-        filters.foldLeft(alternatives)((a, f) => {
-          if (a.size > 1) f(a) else a
-        })
-
-      // Drop arguments that take the wrong number of type
-      // arguments.
-      val posTargLength: Seq[MethodSymbol] => Seq[MethodSymbol] = _.filter { alt =>
-        numTypeParams(alt) == targs.length
-      }
-
-      // Drop methods that are not applicable to the arguments
-      val applicable: Seq[MethodSymbol] => Seq[MethodSymbol] = _.filter { alt =>
-        // Note: combine returns None if a is not applicable and
-        // None.exists(_ => true) == false
-        val paramTypes =
-          valParams(substituteTypeParams(alt)).map(p => unwrap(p.typeSignature))
-        val variadic = isVarArgTypes(paramTypes)
-        val maybeArgTypes =
-          combineInto(variadic)(posVargTypes, nameVargTypes)(paramNames(alt.typeSignature), defaultTypes(alt))
-        maybeArgTypes exists { argTypes =>
-          if (isVarArgTypes(argTypes) && !isVarArgTypes(paramTypes)) false
           else {
-            val a = argTypes
-            val p = extend(paramTypes, argTypes.length)
-            (a corresponds p)(_ weak_<:< _)
+            val tvars = tparams map (TypeVar(_))
+            (actuals1 corresponds formals1) { (actual, formal) =>
+              val tp1 = actual.deconst.instantiateTypeParams(tparams, tvars)
+              val pt1 = actual.instantiateTypeParams(tparams, tvars)
+              tp1 <:< pt1
+            } &&
+              solve(tvars, tparams, List.fill(tparams.length)(COVARIANT), upper = false)
           }
         }
+        isApplicableType(List(), pre.memberType(alt))
       }
-
-      // Always prefer methods that don't need to use default
-      // arguments over those that do.
-      // e.g. when resolving foo(1), prefer def foo(x: Int) over
-      // def foo(x: Int, y: Int = 4)
-      val noDefaults: Seq[MethodSymbol] => Seq[MethodSymbol] =
-        _ filterNot usesDefault
-
-      // Try to select the most specific method. If that's not possible,
-      // return all of the candidates (this will likely cause an error
-      // higher up in the call stack)
-      val mostSpecific: Seq[MethodSymbol] => Seq[MethodSymbol] = { alts =>
-        val sorted = alts.sortWith(moreSpecific)
-        val mostSpecific = sorted.head
-        val agreeTest: MethodSymbol => Boolean =
-          moreSpecific(mostSpecific, _)
-        val disagreeTest: MethodSymbol => Boolean =
-          moreSpecific(_, mostSpecific)
-        if (!sorted.tail.forall(agreeTest)) {
-          mostSpecific +: sorted.tail.filterNot(agreeTest)
-        } else if (sorted.tail.exists(disagreeTest)) {
-          mostSpecific +: sorted.tail.filter(disagreeTest)
-        } else {
-          Seq(mostSpecific)
-        }
+      def isAsGood(alt1: Symbol, alt2: Symbol): Boolean = {
+        alt1 == alt2 ||
+          alt2 == NoSymbol || {
+            val (tparams, formals) = firstParams(pre memberType alt1)
+            isApplicable(alt2, tparams map (_.tpe), formals)
+          }
       }
-
-      def finalResult(t: Type): Type = t match {
-        case PolyType(_, rest) => finalResult(rest)
-        case MethodType(_, result) => finalResult(result)
-        case NullaryMethodType(result) => finalResult(result)
-        case t: Type => t
-      }
-
-      // If a result type is given, drop alternatives that don't meet it
-      val resultType: Seq[MethodSymbol] => Seq[MethodSymbol] =
-        if (expected == NoType) identity
-        else _.filter { alt =>
-          finalResult(substituteTypeParams(alt)) <:< expected
-        }
-
-      def defaultFilteringOps =
-        Seq(posTargLength, resultType, applicable, noDefaults, mostSpecific)
-
-      // Begin Method Proper
-
-
-      val alts = alternatives.map(_.asMethodSymbol)
-
-      val selection = select(alts, defaultFilteringOps)
-
-      val knownApplicable = applicable(selection)
-      
-      if (knownApplicable.size == 1) knownApplicable.head
-      else NoSymbol
+      assert(isOverloaded)
+      val applicables = alternatives filter (isApplicable(_, targs.toList, actuals))
+      def winner(alts: List[Symbol]) =
+        ((NoSymbol: Symbol) /: alts)((best, alt) => if (isAsGood(alt, best)) alt else best)
+      val best = winner(applicables)
+      if (best == winner(applicables.reverse)) best else NoSymbol
     }
   }
 
@@ -364,8 +154,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
   abstract class Symbol protected[Symbols] (initOwner: Symbol, initPos: Position, initName: Name)
           extends SymbolContextApiImpl
              with HasFlags
-             with Annotatable[Symbol]
-             with Attachable {
+             with Annotatable[Symbol] {
 
     type AccessBoundaryType = Symbol
     type AnnotationType     = AnnotationInfo
@@ -387,7 +176,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     def rawowner = _rawowner
     def rawflags = _rawflags
 
-    rawatt = initPos
+    private var rawpos = initPos
 
     val id = nextId() // identity displayed when -uniqid
     //assert(id != 3390, initName)
@@ -400,6 +189,8 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     def validTo = _validTo
     def validTo_=(x: Period) { _validTo = x}
 
+    def pos = rawpos
+    def setPos(pos: Position): this.type = { this.rawpos = pos; this }
     def setName(name: Name): this.type = { this.name = asNameType(name) ; this }
 
     // Update the surrounding scopes
@@ -957,13 +748,13 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     /** Is this symbol an accessor method for outer? */
     final def isOuterAccessor = {
-      hasFlag(STABLE | HIDDEN) &&
+      hasFlag(STABLE | SYNTHETIC) &&
       originalName == nme.OUTER
     }
 
     /** Is this symbol an accessor method for outer? */
     final def isOuterField = {
-      hasFlag(HIDDEN) &&
+      hasFlag(SYNTHETIC) &&
       originalName == nme.OUTER_LOCAL
     }
 
@@ -1381,7 +1172,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
 
     /** Get type. The type of a symbol is:
      *  for a type symbol, the type corresponding to the symbol itself,
-     *    @M you should use tpeHK for a type symbol with type parameters if
+     *     you should use tpeHK for a type symbol with type parameters if
      *       the kind of the type need not be *, as tpe introduces dummy arguments
      *       to generate a type of kind *
      *  for a term symbol, its usual type.
@@ -1441,9 +1232,9 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     }
 
     /** Set initial info. */
-    def setInfo(info: Type): this.type  = { info_=(info); this }
+    def setInfo(info: Type): this.type                      = { info_=(info); this }
     /** Modifies this symbol's info in place. */
-    def modifyInfo(f: Type => Type): this.type = setInfo(f(info))
+    def modifyInfo(f: Type => Type): this.type              = setInfo(f(info))
     /** Substitute second list of symbols for first in current info. */
     def substInfo(syms0: List[Symbol], syms1: List[Symbol]): this.type =
       if (syms0.isEmpty) this
@@ -1572,18 +1363,13 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
      * This is done in checkAccessible and overriding checks in refchecks
      * We can't do this on class loading because it would result in infinite cycles.
      */
-    def cookJavaRawInfo(): Unit = {
-      // only try once...
-      if (this hasFlag TRIEDCOOKING)
-        return
-
-      this setFlag TRIEDCOOKING
-      info  // force the current info
-      if (isJavaDefined || isType && owner.isJavaDefined)
-        this modifyInfo rawToExistential
-      else if (isOverloaded)
-        alternatives withFilter (_.isJavaDefined) foreach (_ modifyInfo rawToExistential)
+    final def cookJavaRawInfo() {
+      if (hasFlag(TRIEDCOOKING)) return else setFlag(TRIEDCOOKING) // only try once...
+      val oldInfo = info
+      doCookJavaRawInfo()
     }
+
+    protected def doCookJavaRawInfo(): Unit
 
     /** The type constructor of a symbol is:
      *  For a type symbol, the type corresponding to the symbol itself,
@@ -1826,7 +1612,6 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
           setInfo (this.info cloneInfo clone)
           setAnnotations this.annotations
       )
-      this.attachments.all.foreach(clone.addAttachment)
       if (clone.thisSym != clone)
         clone.typeOfThis = (clone.typeOfThis cloneInfo clone)
 
@@ -2244,13 +2029,13 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       base.info.decl(sname) filter (_.hasAccessorFlag)
     }
 
-    /** If this is a derived value class, return its unbox method
+    /** Return the accessor method of the first parameter of this class.
      *  or NoSymbol if it does not exist.
      */
-    def derivedValueClassUnbox: Symbol = NoSymbol
+    def firstParamAccessor: Symbol = NoSymbol
 
      /** The case module corresponding to this case class
-     *  @pre case class is a member of some other class or package
+     *   case class is a member of some other class or package
      */
     final def caseModule: Symbol = {
       var modname = name.toTermName
@@ -2671,6 +2456,36 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
         name = nme.expandedName(name.toTermName, base)
       }
     }
+
+    protected def doCookJavaRawInfo() {
+      def cook(sym: Symbol) {
+        require(sym.isJavaDefined, sym)
+        // @M: I think this is more desirable, but Martin prefers to leave raw-types as-is as much as possible
+        // object rawToExistentialInJava extends TypeMap {
+        //   def apply(tp: Type): Type = tp match {
+        //     // any symbol that occurs in a java sig, not just java symbols
+        //     // see http://lampsvn.epfl.ch/trac/scala/ticket/2454#comment:14
+        //     case TypeRef(pre, sym, List()) if !sym.typeParams.isEmpty =>
+        //       val eparams = typeParamsToExistentials(sym, sym.typeParams)
+        //       existentialAbstraction(eparams, TypeRef(pre, sym, eparams map (_.tpe)))
+        //     case _ =>
+        //       mapOver(tp)
+        //   }
+        // }
+        val tpe1 = rawToExistential(sym.tpe)
+        // println("cooking: "+ sym +": "+ sym.tpe +" to "+ tpe1)
+        if (tpe1 ne sym.tpe) {
+          sym.setInfo(tpe1)
+        }
+      }
+
+      if (isJavaDefined)
+        cook(this)
+      else if (isOverloaded)
+        for (sym2 <- alternatives)
+          if (sym2.isJavaDefined)
+            cook(sym2)
+    }
   }
   implicit val TermSymbolTag = ClassTag[TermSymbol](classOf[TermSymbol])
 
@@ -2851,7 +2666,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       tpeCache
     }
 
-    /** @M -- tpe vs tpeHK:
+    /**  -- tpe vs tpeHK:
      *
      *    tpe: creates a TypeRef with dummy type arguments and kind *
      *  tpeHK: creates a TypeRef with no type arguments but with type parameters
@@ -2899,6 +2714,15 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
      * public class Test1<T extends Test3> {}
      * info for T in Test1 should be >: Nothing <: Test3[_]
      */
+    protected def doCookJavaRawInfo() {
+      if (isJavaDefined || owner.isJavaDefined) {
+        val tpe1 = rawToExistential(info)
+        // println("cooking type: "+ this +": "+ info +" to "+ tpe1)
+        if (tpe1 ne info) {
+          setInfo(tpe1)
+        }
+      }
+    }
 
     Statistics.incCounter(typeSymbolCount)
   }
@@ -3112,10 +2936,8 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
       clone
     }
 
-    override def derivedValueClassUnbox =
-      (info.decl(nme.unbox)) orElse
-      (info.decls.find(_ hasAllFlags PARAMACCESSOR | METHOD) getOrElse
-       NoSymbol)
+    override def firstParamAccessor =
+      info.decls.find(_ hasAllFlags PARAMACCESSOR | METHOD) getOrElse NoSymbol
 
     private[this] var childSet: Set[Symbol] = Set()
     override def children = childSet
@@ -3271,6 +3093,7 @@ trait Symbols extends api.Symbols { self: SymbolTable =>
     override def info: Type = NoType
     override def existentialBound: Type = NoType
     override def rawInfo: Type = NoType
+    protected def doCookJavaRawInfo() {}
     override def accessBoundary(base: Symbol): Symbol = enclosingRootClass
     def cloneSymbolImpl(owner: Symbol, newFlags: Long) = abort("NoSymbol.clone()")
     override def originalEnclosingMethod = this

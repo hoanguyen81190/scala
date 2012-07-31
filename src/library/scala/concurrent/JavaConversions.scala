@@ -50,16 +50,8 @@ object JavaConversions {
       }
     }
 
-  /**
-   * Creates a new `ExecutionContext` which uses the provided `ExecutorService`.
-   */
-  implicit def asExecutionContext(exec: ExecutorService): ExecutionContextExecutorService =
-    ExecutionContext.fromExecutorService(exec)
+  implicit def asExecutionContext(exec: ExecutorService): ExecutionContext = null // TODO
 
-  /**
-   * Creates a new `ExecutionContext` which uses the provided `Executor`.
-   */
-  implicit def asExecutionContext(exec: Executor): ExecutionContextExecutor =
-    ExecutionContext.fromExecutor(exec)
+  implicit def asExecutionContext(exec: Executor): ExecutionContext = null // TODO
 
 }
