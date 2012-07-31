@@ -6,47 +6,46 @@
 package scala.tools.nsc
 package interpreter
 
-import scala.collection.{ mutable }
+import reflect.internal.Chars
 
 trait MemberHandlers {
   val intp: IMain
 
-  import intp.{ Request, global, naming }
+  import intp.{ Request, global}
   import global._
-  import naming._
 
-  private def codegenln(leadingPlus: Boolean, xs: String*): String = codegen(leadingPlus, (xs ++ Array("\n")): _*)
-  private def codegenln(xs: String*): String = codegenln(true, xs: _*)
+//  private def codegenln(leadingPlus: Boolean, xs: String*): String = codegen(leadingPlus, (xs ++ Array("\n")): _*)
+//  private def codegenln(xs: String*): String = codegenln(true, xs: _*)
 
-  private def codegen(xs: String*): String = codegen(true, xs: _*)
-  private def codegen(leadingPlus: Boolean, xs: String*): String = {
-    val front = if (leadingPlus) "+ " else ""
-    front + (xs map string2codeQuoted mkString " + ")
-  }
+//  private def codegen(xs: String*): String = codegen(true, xs: _*)
+//  private def codegen(leadingPlus: Boolean, xs: String*): String = {
+//    val front = if (leadingPlus) "+ " else ""
+//    front + (xs map string2codeQuoted mkString " + ")
+//  }
   private implicit def name2string(name: Name) = name.toString
 
   /** A traverser that finds all mentioned identifiers, i.e. things
    *  that need to be imported.  It might return extra names.
    */
-  private class ImportVarsTraverser extends Traverser {
-    val importVars = new mutable.HashSet[Name]()
-
-    override def traverse(ast: Tree) = ast match {
-      case Ident(name) =>
-        // XXX this is obviously inadequate but it's going to require some effort
-        // to get right.
-        if (name.toString startsWith "x$") ()
-        else importVars += name
-      case _        => super.traverse(ast)
-    }
-  }
-  private object ImportVarsTraverser {
-    def apply(member: Tree) = {
-      val ivt = new ImportVarsTraverser()
-      ivt traverse member
-      ivt.importVars.toList
-    }
-  }
+//  private class ImportVarsTraverser extends Traverser {
+//    val importVars = new mutable.HashSet[Name]()
+//
+//    override def traverse(ast: Tree) = ast match {
+//      case Ident(name) =>
+//        // XXX this is obviously inadequate but it's going to require some effort
+//        // to get right.
+//        if (name.toString startsWith "x$") ()
+//        else importVars += name
+//      case _        => super.traverse(ast)
+//    }
+//  }
+//  private object ImportVarsTraverser {
+//    def apply(member: Tree) = {
+//      val ivt = new ImportVarsTraverser()
+//      ivt traverse member
+//      ivt.importVars.toList
+//    }
+//  }
 
   def chooseHandler(member: Tree): MemberHandler = member match {
     case member: DefDef        => new DefHandler(member)
@@ -67,34 +66,34 @@ trait MemberHandlers {
     def keyword         = member.keyword
     def prettyName      = name.decode
 
-    override def definesImplicit = member.mods.isImplicit
+//    override def definesImplicit = member.mods.isImplicit
     override def definesTerm: Option[TermName] = Some(name.toTermName) filter (_ => name.isTermName)
     override def definesType: Option[TypeName] = Some(name.toTypeName) filter (_ => name.isTypeName)
-    override def definedSymbols = if (symbol eq NoSymbol) Nil else List(symbol)
+//    override def definedSymbols = if (symbol eq NoSymbol) Nil else List(symbol)
   }
 
   /** Class to handle one member among all the members included
    *  in a single interpreter request.
    */
   sealed abstract class MemberHandler(val member: Tree) {
-    def definesImplicit = false
+//    def definesImplicit = false
     def definesValue    = false
     def isLegalTopLevel = false
 
     def definesTerm     = Option.empty[TermName]
     def definesType     = Option.empty[TypeName]
 
-    lazy val referencedNames = ImportVarsTraverser(member)
-    def importedNames        = List[Name]()
-    def definedNames         = definesTerm.toList ++ definesType.toList
-    def definedOrImported    = definedNames ++ importedNames
-    def definedSymbols       = List[Symbol]()
+//    lazy val referencedNames = ImportVarsTraverser(member)
+//    def importedNames        = List[Name]()
+//    def definedNames         = definesTerm.toList ++ definesType.toList
+//    def definedOrImported    = definedNames ++ importedNames
+//    def definedSymbols       = List[Symbol]()
 
     def extraCodeToEvaluate(req: Request): String = ""
     def resultExtractionCode(req: Request): String = ""
 
-    private def shortName = this.getClass.toString split '.' last
-    override def toString = shortName + referencedNames.mkString(" (refs: ", ", ", ")")
+//    private def shortName = this.getClass.toString split '.' last
+//    override def toString = shortName + referencedNames.mkString(" (refs: ", ", ", ")")
   }
 
   class GenericHandler(member: Tree) extends MemberHandler(member)
@@ -103,18 +102,28 @@ trait MemberHandlers {
     val maxStringElements = 1000  // no need to mkString billions of elements
     override def definesValue = true
 
+    def string2code(str: String): String = {
+      val res = new StringBuilder
+      for (c <- str) c match {
+        case '"' | '\'' | '\\'  => res += '\\' ; res += c
+        case _ if c.isControl   => res ++= Chars.char2uescape(c)
+        case _                  => res += c
+      }
+      res.toString
+    }
+
     override def resultExtractionCode(req: Request): String = {
 //      val isInternal = isUserVarName(name) && req.lookupTypeOf(name) == "Unit"
 //      if (!mods.isPublic || isInternal) ""
 //      else {
         // if this is a lazy val we avoid evaluating it here
+        def any2stringOf(x: Any, maxlen: Int) =
+            "scala.runtime.ScalaRunTime.replStringOf(%s, %s)".format(x, maxlen)
         val resultString =
-          if (mods.isLazy) codegenln(false, "<lazy>")
-          else any2stringOf(req fullPath name, maxStringElements)
+        any2stringOf(req fullPath name, maxStringElements)
 
         val vidString =
-          if (replProps.vids) """" + " @ " + "%%8x".format(System.identityHashCode(%s)) + " """.trim.format(req fullPath name)
-          else ""
+          ""
 
         """ + "%s%s: %s = " + %s""".format(prettyName, vidString, string2code(req typeOf name), resultString)
 //      }
@@ -122,22 +131,22 @@ trait MemberHandlers {
   }
 
   class DefHandler(member: DefDef) extends MemberDefHandler(member) {
-    private def vparamss = member.vparamss
-    private def isMacro = member.mods.hasFlag(scala.reflect.internal.Flags.MACRO)
-    // true if not a macro and 0-arity
-    override def definesValue = !isMacro && flattensToEmpty(vparamss)
-    override def resultExtractionCode(req: Request) =
-      if (mods.isPublic) codegenln(name, ": ", req.typeOf(name)) else ""
+//    private def vparamss = member.vparamss
+//    private def isMacro = member.mods.hasFlag(scala.reflect.internal.Flags.MACRO)
+//    // true if not a macro and 0-arity
+//    override def definesValue = !isMacro && flattensToEmpty(vparamss)
+//    override def resultExtractionCode(req: Request) =
+//      if (mods.isPublic) codegenln(name, ": ", req.typeOf(name)) else ""
   }
 
   class AssignHandler(member: Assign) extends MemberHandler(member) {
-    val Assign(lhs, rhs) = member
-    val name = newTermName(freshInternalVarName())
-
-    override def definesTerm = Some(name)
-    override def definesValue = true
-    override def extraCodeToEvaluate(req: Request) =
-      """val %s = %s""".format(name, lhs)
+//    val Assign(lhs, rhs) = member
+//    val name = newTermName(freshInternalVarName())
+//
+//    override def definesTerm = Some(name)
+//    override def definesValue = true
+//    override def extraCodeToEvaluate(req: Request) =
+//      """val %s = %s""".format(name, lhs)
 
     /** Print out lhs instead of the generated varName */
 //    override def resultExtractionCode(req: Request) = {
@@ -149,59 +158,59 @@ trait MemberHandlers {
   }
 
   class ModuleHandler(module: ModuleDef) extends MemberDefHandler(module) {
-    override def definesTerm = Some(name)
-    override def definesValue = true
-    override def isLegalTopLevel = true
-
-    override def resultExtractionCode(req: Request) = codegenln("defined module ", name)
+//    override def definesTerm = Some(name)
+//    override def definesValue = true
+//    override def isLegalTopLevel = true
+//
+//    override def resultExtractionCode(req: Request) = codegenln("defined module ", name)
   }
 
   class ClassHandler(member: ClassDef) extends MemberDefHandler(member) {
-    override def definesType = Some(name.toTypeName)
-    override def definesTerm = Some(name.toTermName) filter (_ => mods.isCase)
-    override def isLegalTopLevel = true
-
-    override def resultExtractionCode(req: Request) =
-      codegenln("defined %s %s".format(keyword, name))
+//    override def definesType = Some(name.toTypeName)
+//    override def definesTerm = Some(name.toTermName) filter (_ => mods.isCase)
+//    override def isLegalTopLevel = true
+//
+//    override def resultExtractionCode(req: Request) =
+//      codegenln("defined %s %s".format(keyword, name))
   }
 
   class TypeAliasHandler(member: TypeDef) extends MemberDefHandler(member) {
-    private def isAlias = mods.isPublic && treeInfo.isAliasTypeDef(member)
-    override def definesType = Some(name.toTypeName) filter (_ => isAlias)
-
-    override def resultExtractionCode(req: Request) =
-      codegenln("defined type alias ", name) + "\n"
+//    private def isAlias = mods.isPublic && treeInfo.isAliasTypeDef(member)
+//    override def definesType = Some(name.toTypeName) filter (_ => isAlias)
+//
+//    override def resultExtractionCode(req: Request) =
+//      codegenln("defined type alias ", name) + "\n"
   }
 
   class ImportHandler(imp: Import) extends MemberHandler(imp) {
-    val Import(expr, selectors) = imp
-
-    override def isLegalTopLevel = true
-
-    def createImportForName(name: Name): String = {
-      selectors foreach {
-        case sel @ ImportSelector(old, _, `name`, _)  => return "import %s.{ %s }".format(expr, sel)
-        case _ => ()
-      }
-      "import %s.%s".format(expr, name)
-    }
-    // TODO: Need to track these specially to honor Predef masking attempts,
-    // because they must be the leading imports in the code generated for each
-    // line.  We can use the same machinery as Contexts now, anyway.
-    def isPredefImport = isReferenceToPredef(expr)
-
-    // wildcard imports, e.g. import foo._
-    private def selectorWild    = selectors filter (_.name == nme.USCOREkw)
-    // renamed imports, e.g. import foo.{ bar => baz }
-    private def selectorRenames = selectors map (_.rename) filterNot (_ == null)
-
-    /** Whether this import includes a wildcard import */
-    val importsWildcard = selectorWild.nonEmpty
-
-
-
-
-    def importString = imp.toString
-    override def resultExtractionCode(req: Request) = codegenln(importString) + "\n"
+//    val Import(expr, selectors) = imp
+//
+//    override def isLegalTopLevel = true
+//
+//    def createImportForName(name: Name): String = {
+//      selectors foreach {
+//        case sel @ ImportSelector(old, _, `name`, _)  => return "import %s.{ %s }".format(expr, sel)
+//        case _ => ()
+//      }
+//      "import %s.%s".format(expr, name)
+//    }
+//    // TODO: Need to track these specially to honor Predef masking attempts,
+//    // because they must be the leading imports in the code generated for each
+//    // line.  We can use the same machinery as Contexts now, anyway.
+//    def isPredefImport = isReferenceToPredef(expr)
+//
+//    // wildcard imports, e.g. import foo._
+//    private def selectorWild    = selectors filter (_.name == nme.USCOREkw)
+//    // renamed imports, e.g. import foo.{ bar => baz }
+//    private def selectorRenames = selectors map (_.rename) filterNot (_ == null)
+//
+//    /** Whether this import includes a wildcard import */
+//    val importsWildcard = selectorWild.nonEmpty
+//
+//
+//
+//
+//    def importString = imp.toString
+//    override def resultExtractionCode(req: Request) = codegenln(importString) + "\n"
   }
 }

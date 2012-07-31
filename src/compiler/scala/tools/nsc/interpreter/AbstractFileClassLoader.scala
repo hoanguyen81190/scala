@@ -13,10 +13,13 @@ import util.ScalaClassLoader
  *
  * @author Lex Spoon
  */
-class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
-  extends ClassLoader(parent)
+//using AssemblyClassLoader in ikvm?
+
+class AbstractFileClassLoader(val root: AbstractFile)
+  extends ClassLoader
   with ScalaClassLoader
 {
+  def this(root: AbstractFile, par: java.lang.ClassLoader) = this(root)
   protected def classNameToPath(name: String): String =
     if (name endsWith ".class") name
     else name.replace('.', '/') + ".class"
@@ -41,7 +44,7 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
     case null => super.classBytes(name)
     case file => file.toByteArray
   }
-  override def findClass(name: String): JClass = {
+  override def findClass(name: String): java.lang.Class[_] = {
     val bytes = classBytes(name)
     if (bytes.length == 0)
       throw new ClassNotFoundException(name)

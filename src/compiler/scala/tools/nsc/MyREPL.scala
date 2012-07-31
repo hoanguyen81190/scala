@@ -5,18 +5,10 @@
 
 package scala.tools.nsc
 
-import interpreter.{MyILoop}
+import interpreter.{ILoop}
 
 object MyREPL {
-
-  def errorFn(str: String): Boolean = {
-    Console.err println str
-    false
-  }
   def main(args: Array[String]) {
-    val command = new GenericRunnerCommand(args.toList, (x: String) => errorFn(x))
-    import command.{ settings}
-
-    Right(new MyILoop process settings)
+    new ILoop process
   }
 }

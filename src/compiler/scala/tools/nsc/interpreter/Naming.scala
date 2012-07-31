@@ -23,43 +23,14 @@ trait Naming {
     def print  = propOr("print")
     def result = propOr("result")
 
-    // The prefix for unnamed results: by default res0, res1, etc.
-    def res   = propOr("res", "res")  // INTERPRETER_VAR_PREFIX
-    // Internal ones
-    def ires  = propOr("ires")
   }
   lazy val sessionNames: SessionNames = new SessionNames { }
 
-  /** Generates names pre0, pre1, etc. via calls to apply method */
-  class NameCreator(pre: String) {
-    private var x = -1
-    var mostRecent: String = ""
-
-    def apply(): String = {
-      x += 1
-      mostRecent = pre + x
-      mostRecent
-    }
-    def reset(): Unit = x = -1
-    def didGenerate(name: String) =
-      (name startsWith pre) && ((name drop pre.length) forall (_.isDigit))
-  }
-
-  private lazy val userVar     = new NameCreator(sessionNames.res)  // var name, like res0
-  private lazy val internalVar = new NameCreator(sessionNames.ires) // internal var name, like $ires0
-
-
-  def isUserVarName(name: String)     = userVar didGenerate name
-  def isInternalVarName(name: String) = internalVar didGenerate name
 
   val freshLineId            = {
     var x = 0
     () => { x += 1 ; x }
   }
-  def freshUserVarName() = userVar()
-  def freshInternalVarName() = internalVar()
 
-
-
-
+//  def freshInternalVarName() = internalVar()
 }
